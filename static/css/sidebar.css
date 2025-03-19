@@ -1,0 +1,27 @@
+/* 侧边栏样式 */
+.sidebar {
+    background-color: #4e73df; /* 保持原有的蓝色背景 */
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.85); /* 白色，略微透明，增加可读性 */
+    transition: color 0.2s ease;
+}
+
+.sidebar .nav-link:hover {
+    color: #ffffff; /* 悬停时完全不透明的白色 */
+}
+
+.sidebar .nav-link.active {
+    color: #ffffff; /* 激活状态的链接为纯白色 */
+    font-weight: 600;
+}
+
+/* 图标颜色 */
+.sidebar .nav-link i {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.sidebar .nav-link:hover i {
+    color: #ffffff;
+} 

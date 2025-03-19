@@ -1,0 +1,7 @@
+.modules-container .module {
+    display: none;
+}
+
+.modules-container .module.active {
+    display: block;
+} 

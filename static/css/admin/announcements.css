@@ -1,0 +1,16 @@
+.dashboard-link {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    z-index: 25;
+    pointer-events: auto !important;
+}
+
+.dashboard-link .td_btn_in {
+    pointer-events: auto !important;
+}
+
+.header-actions {
+    position: relative;
+    z-index: 30;
+} 

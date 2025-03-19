@@ -1,0 +1,134 @@
+.grade-input {
+    width: 85px;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    padding: 6px 4px;
+    height: auto;
+}
+.save-status {
+    display: none;
+    margin-left: 10px;
+}
+.save-success {
+    color: #28a745;
+}
+.save-error {
+    color: #dc3545;
+}
+/* Table enhancement styles */
+.table-container {
+    overflow-x: auto;
+    padding: 10px;
+    margin: 0 -10px;
+}
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    min-width: 900px; /* Ensure table has minimum width */
+}
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+    color: var(--td-heading-color); /* Consistent font color with page style */
+}
+.table th {
+    background-color: #2c3e50; /* Dark background for better contrast */
+    color: #ffffff; /* Pure white text */
+    font-weight: 600; /* Increase font weight */
+    padding: 12px 10px;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* Add text shadow for better readability */
+    letter-spacing: 0.5px; /* Increase letter spacing */
+}
+.table thead th {
+    border-bottom: 2px solid #1abc9c; /* Add bottom border for emphasis */
+}
+.table thead th:first-child {
+    border-top-left-radius: 8px;
+}
+.table thead th:last-child {
+    border-top-right-radius: 8px;
+}
+.table tbody tr:hover {
+    background-color: rgba(var(--td-accent-rgb), 0.05);
+}
+.table tbody tr:nth-child(odd) {
+    background-color: rgba(var(--td-accent-rgb), 0.02);
+}
+.table td {
+    padding: 12px 10px;
+}
+.btn-save {
+    min-width: 90px;
+    padding: 8px 12px;
+    position: relative;
+    z-index: 1;
+}
+.btn-save i {
+    margin-right: 8px;
+}
+.dashboard-link {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    z-index: 25;
+    pointer-events: auto !important;
+}
+.dashboard-link .td_btn_in {
+    pointer-events: auto !important;
+}
+/* Fix save button style issues */
+.td_btn.btn-save span {
+    display: inline-flex;
+    align-items: center;
+}
+/* Ensure back button is clickable - enhanced version */
+.header-actions {
+    position: relative;
+    z-index: 30;
+}
+/* Ensure modal displays correctly */
+.modal-backdrop {
+    z-index: 50 !important;
+}
+.modal {
+    z-index: 60 !important;
+}
+.modal-dialog {
+    z-index: 70 !important;
+}
+/* Ensure buttons are clickable */
+.header-actions button {
+    position: relative;
+    z-index: 25;
+    pointer-events: auto !important;
+}
+.header-actions button .td_btn_in {
+    pointer-events: auto !important;
+}
+/* Enhanced button style */
+.action-button {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    margin-bottom: 5px !important;
+    position: relative !important;
+    z-index: 999 !important;
+}
+/* Fix frontend overlap issues */
+.td_preloader, .td_scrollup {
+    z-index: 1000 !important;
+}
+/* Resolve issues with sticky header */
+.td_sticky_header {
+    z-index: 40 !important;
+}
+/* Ensure page main content is not covered by header */
+.main-content {
+    position: relative;
+    padding-top: 20px; /* Increase top padding */
+    margin-top: 10px; /* Increase top margin */
+} 
