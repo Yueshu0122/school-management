@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-d03=g8*#m$*g&72cq2no6-%n*esj4m$s&r2_qxwzt_lyeesv(t"
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['school-management-uoh2.onrender.com']
 
 INSTALLED_APPS = [
     # Django built-in apps
