@@ -116,14 +116,15 @@ USE_TZ = True
 # 静态文件配置
 STATIC_URL = '/static/'  # 静态文件的URL前缀
 
-# 静态文件目录列表，用于开发环境
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # 项目根目录下的static文件夹
-    BASE_DIR / "templates" / "assets",  # 如果您的资源在templates/assets目录下
-]
+if DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / "static",
+        BASE_DIR / "templates" / "assets",
+    ]
+else:
+    STATICFILES_DIRS = []  # 生产环境下不使用 STATICFILES_DIRS
 
-# 静态文件收集目录，用于生产环境
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # 生产环境用于 `collectstatic`
 
 
 # 媒体文件配置（如果需要）
