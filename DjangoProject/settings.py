@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-d03=g8*#m$*g&72cq2no6-%n*esj4m$s&r2_qxwzt_lyeesv(t"
 DEBUG = True
-ALLOWED_HOSTS = ['school-management-uoh2.onrender.com']
+ALLOWED_HOSTS = ['school-management-uoh2.onrender.com', 'localhost', '127.0.0.1']
 
 # 如果有环境变量 PORT，则使用它；否则，默认为8000
 PORT = os.getenv('PORT', '8000')
