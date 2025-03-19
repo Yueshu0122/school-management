@@ -13,12 +13,22 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 # settings.py
 
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-d03=g8*#m$*g&72cq2no6-%n*esj4m$s&r2_qxwzt_lyeesv(t"
 DEBUG = True
 ALLOWED_HOSTS = ['school-management-uoh2.onrender.com']
+
+# 如果有环境变量 PORT，则使用它；否则，默认为8000
+PORT = os.getenv('PORT', '8000')
+
+# 在某些情况下，你可能需要基于环境变量调整其他设置
+if os.getenv('ENVIRONMENT') == 'production':
+    DEBUG = False
+else:
+    DEBUG = True
 
 INSTALLED_APPS = [
     # Django built-in apps
