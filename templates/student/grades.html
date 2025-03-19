@@ -1,0 +1,53 @@
+{% extends 'student/base.html' %}
+
+{% block title %}我的成绩{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>我的成绩</h2>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 返回仪表盘
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>期末考试</th>
+                                    <th>作业成绩</th>
+                                    <th>平时测验</th>
+                                    <th>出勤情况</th>
+                                    <th>绩点</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>{{ grade.course.course_id }}</td>
+                                    <td>{{ grade.course.course_name }}</td>
+                                    <td>{{ grade.final_exam }}</td>
+                                    <td>{{ grade.assignments }}</td>
+                                    <td>{{ grade.regular_quiz }}</td>
+                                    <td>{{ grade.attendance }}</td>
+                                    <td>{{ grade.gpa }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">暂无成绩信息</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

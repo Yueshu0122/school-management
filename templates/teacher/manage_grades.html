@@ -1,0 +1,198 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}成绩管理 - {{ course.course_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .grade-input {
+        width: 80px;
+    }
+    .save-status {
+        display: none;
+        margin-left: 10px;
+    }
+    .save-success {
+        color: #28a745;
+    }
+    .save-error {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>{{ course.course_name }} - 成绩管理</h2>
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 返回仪表盘
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>学号</th>
+                                    <th>学生姓名</th>
+                                    <th>期末考试</th>
+                                    <th>作业成绩</th>
+                                    <th>平时测验</th>
+                                    <th>出勤情况</th>
+                                    <th>绩点</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr data-grade-id="{{ grade.id }}">
+                                    <td>{{ grade.student.student_id }}</td>
+                                    <td>{{ grade.student.full_name }}</td>
+                                    <td>
+                                        <input type="number" class="form-control grade-input" 
+                                               name="final_exam" value="{{ grade.final_exam }}"
+                                               min="0" max="100" step="0.01"
+                                               title="期末考试成绩">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control grade-input" 
+                                               name="assignments" value="{{ grade.assignments }}"
+                                               min="0" max="100" step="0.01"
+                                               title="作业成绩">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control grade-input" 
+                                               name="regular_quiz" value="{{ grade.regular_quiz }}"
+                                               min="0" max="100" step="0.01"
+                                               title="平时测验成绩">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control grade-input" 
+                                               name="attendance" value="{{ grade.attendance }}"
+                                               min="0" max="100" step="0.01"
+                                               title="出勤成绩">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control grade-input" 
+                                               name="gpa" value="{{ grade.gpa }}"
+                                               min="0" max="4" step="0.01"
+                                               title="绩点">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <button class="btn btn-primary btn-sm save-grade">
+                                                <i class="fas fa-save"></i> 保存
+                                            </button>
+                                            <span class="save-status save-success">
+                                                <i class="fas fa-check"></i> 已保存
+                                            </span>
+                                            <span class="save-status save-error">
+                                                <i class="fas fa-times"></i> 保存失败
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">暂无学生选修此课程</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // 验证成绩输入
+    function validateGrade(value, min, max) {
+        const num = parseFloat(value);
+        return !isNaN(num) && num >= min && num <= max;
+    }
+
+    // 显示保存状态
+    function showSaveStatus(row, isSuccess, message) {
+        const statusElements = row.find('.save-status');
+        const successElement = row.find('.save-success');
+        const errorElement = row.find('.save-error');
+        
+        statusElements.hide();
+        if (isSuccess) {
+            successElement.fadeIn().delay(2000).fadeOut();
+        } else {
+            errorElement.attr('title', message).fadeIn().delay(2000).fadeOut();
+        }
+    }
+
+    $('.save-grade').click(function() {
+        const row = $(this).closest('tr');
+        const gradeId = row.data('grade-id');
+        const button = $(this);
+        
+        // 验证所有输入
+        let isValid = true;
+        const data = {};
+        
+        row.find('input[type="number"]').each(function() {
+            const input = $(this);
+            const name = input.attr('name');
+            const value = input.val();
+            const min = parseFloat(input.attr('min'));
+            const max = parseFloat(input.attr('max'));
+            
+            if (!validateGrade(value, min, max)) {
+                isValid = false;
+                input.addClass('is-invalid');
+                alert(`${input.attr('title')}必须在${min}到${max}之间`);
+                return false;
+            }
+            input.removeClass('is-invalid');
+            data[name] = value;
+        });
+        
+        if (!isValid) return;
+        
+        // 禁用按钮，显示加载状态
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> 保存中');
+        
+        // 添加CSRF token
+        data['csrfmiddlewaretoken'] = $('[name=csrfmiddlewaretoken]').val();
+        
+        $.ajax({
+            url: `/accounts/teacher/grade/update/${gradeId}/`,
+            method: 'POST',
+            data: data,
+            success: function(response) {
+                if (response.status === 'success') {
+                    showSaveStatus(row, true);
+                } else {
+                    showSaveStatus(row, false, response.message || '保存失败');
+                }
+            },
+            error: function(xhr) {
+                const message = xhr.responseJSON ? xhr.responseJSON.message : '网络错误，请重试';
+                showSaveStatus(row, false, message);
+            },
+            complete: function() {
+                // 恢复按钮状态
+                button.prop('disabled', false).html('<i class="fas fa-save"></i> 保存');
+            }
+        });
+    });
+
+    // 输入时移除错误状态
+    $('.grade-input').on('input', function() {
+        $(this).removeClass('is-invalid');
+    });
+});
+</script>
+{% endblock %} 

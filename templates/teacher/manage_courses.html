@@ -1,0 +1,200 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}课程管理{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>课程管理</h2>
+            <div>
+                <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addMajorModal">
+                    <i class="fas fa-plus"></i> 添加专业
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+                    <i class="fas fa-plus"></i> 添加课程
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                {% if courses %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>学分</th>
+                                    <th>学院</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                <tr>
+                                    <td>{{ course.course_id }}</td>
+                                    <td>{{ course.course_name }}</td>
+                                    <td>{{ course.credits }}</td>
+                                    <td>{{ course.college_id }}</td>
+                                    <td>
+                                        <a href="{% url 'manage_grades' course.course_id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-graduation-cap"></i> 成绩管理
+                                        </a>
+                                        <a href="{% url 'manage_course_students' course.course_id %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-users"></i> 学生管理
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">暂无课程</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Course Modal -->
+<div class="modal fade" id="addCourseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加新课程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCourseForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="course_id" class="form-label">课程编号</label>
+                        <input type="number" class="form-control" id="course_id" name="course_id" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="course_name" class="form-label">课程名称</label>
+                        <input type="text" class="form-control" id="course_name" name="course_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="credits" class="form-label">学分</label>
+                        <input type="number" class="form-control" id="credits" name="credits" required min="1" max="6">
+                    </div>
+                    <div class="mb-3">
+                        <label for="college_id" class="form-label">学院编号</label>
+                        <input type="number" class="form-control" id="college_id" name="college_id" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveCourse">保存课程</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Major Modal -->
+<div class="modal fade" id="addMajorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加新专业</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMajorForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="major_id" class="form-label">专业编号</label>
+                        <input type="number" class="form-control" id="major_id" name="major_id" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="major_name" class="form-label">专业名称</label>
+                        <input type="text" class="form-control" id="major_name" name="major_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="major_college_id" class="form-label">学院编号</label>
+                        <input type="number" class="form-control" id="major_college_id" name="college_id" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveMajor">保存专业</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#saveCourse').click(function() {
+        const formData = {
+            course_id: $('#course_id').val(),
+            course_name: $('#course_name').val(),
+            credits: $('#credits').val(),
+            college_id: $('#college_id').val()
+        };
+
+        $.ajax({
+            url: '{% url "create_course" %}',
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#addCourseModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert('创建课程失败: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                alert('创建课程失败: ' + (xhr.responseJSON ? xhr.responseJSON.message : '未知错误'));
+            }
+        });
+    });
+
+    $('#saveMajor').click(function() {
+        const formData = {
+            major_id: $('#major_id').val(),
+            major_name: $('#major_name').val(),
+            college_id: $('#major_college_id').val()
+        };
+
+        $.ajax({
+            url: '/common/major/create/',
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#addMajorModal').modal('hide');
+                    alert('专业创建成功');
+                } else {
+                    alert('创建专业失败: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                alert('创建专业失败: ' + (xhr.responseJSON ? xhr.responseJSON.message : '未知错误'));
+            }
+        });
+    });
+
+    // 清除模态框中的表单数据
+    $('#addCourseModal, #addMajorModal').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,40 @@
+{% extends 'student/base.html' %}
+
+{% block title %}公告列表{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>公告列表</h2>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 返回仪表盘
+            </a>
+        </div>
+
+        {% if announcements %}
+            <div class="row">
+                {% for announcement in announcements %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">{{ announcement.title }}</h5>
+                                <small class="text-muted">
+                                    发布于 {{ announcement.publish_date|date:"Y年m月d日" }}
+                                </small>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ announcement.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 暂无公告
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,87 @@
+{% extends 'student/base.html' %}
+
+{% block title %}学生仪表盘{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h2>欢迎, {{ student.full_name }}</h2>
+        <p class="text-muted">学号: {{ student.student_id }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Grades Section -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">最近成绩</h4>
+                <a href="{% url 'student_grades' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-graduation-cap"></i> 查看所有成绩
+                </a>
+            </div>
+            <div class="card-body">
+                {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>课程</th>
+                                    <th>期末考试</th>
+                                    <th>作业成绩</th>
+                                    <th>平时测验</th>
+                                    <th>出勤情况</th>
+                                    <th>绩点</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>{{ grade.course.course_name }}</td>
+                                    <td>{{ grade.final_exam }}</td>
+                                    <td>{{ grade.assignments }}</td>
+                                    <td>{{ grade.regular_quiz }}</td>
+                                    <td>{{ grade.attendance }}</td>
+                                    <td>{{ grade.gpa }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">暂无成绩信息</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements Section -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">最新公告</h4>
+                <a href="{% url 'student_announcements' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-bullhorn"></i> 查看全部
+                </a>
+            </div>
+            <div class="card-body">
+                {% if announcements %}
+                    <div class="list-group list-group-flush">
+                        {% for announcement in announcements %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ announcement.title }}</h6>
+                            <p class="mb-1 text-truncate">{{ announcement.content }}</p>
+                            <small class="text-muted">
+                                {{ announcement.publish_date|date:"Y年m月d日" }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">暂无公告</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
