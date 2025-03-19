@@ -137,8 +137,7 @@ local_settings.py
 # Media files
 media/
 
-# Static files
-staticfiles/
+
 
 # Node modules
 node_modules/
