@@ -1,0 +1,139 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Announcement Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/announcement_details.css' %}">
+<style>
+    .announcement-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        transition: transform 0.3s ease;
+    }
+    .announcement-image:hover {
+        transform: scale(1.02);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section>
+  <div class="td_height_120 td_height_lg_80"></div>
+  <div class="container">
+    <div class="row td_gap_y_50">
+      <div class="col-12">
+        <div class="td_blog_details_wrap">
+          <!-- Return and Edit/Delete buttons -->
+          <div class="mb-4 d-flex justify-content-end align-items-center">
+            
+            <a href="{% url 'admin_announcements' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium me-2">
+              <span class="td_btn_in td_accent_color">
+                <span>Back to Announcements</span><i class="fas fa-arrow-right ms-2"></i>
+              </span>
+            </a>
+          </div>
+
+          <div class="td_blog_details">
+            <!-- Announcement image -->
+            <div class="td_blog_details_img mb-4">
+              <img src="{{ announcement.image.url|default:'/static/assets/img/Background1.png' }}" 
+                   alt="{{ announcement.title|default:'Announcement Image' }}" 
+                   class="announcement-image">
+            </div>
+
+            <!-- Announcement information -->
+            <div class="td_blog_details_info">
+              <h1>{{ announcement.title }}</h1>
+              
+              <!-- Announcement metadata -->
+              <div class="td_blog_details_meta">
+                <span><i class="far fa-calendar-alt"></i>{{ announcement.publish_date|date:"F d, Y" }}</span>
+                <span><i class="far fa-user"></i>{{ announcement.author }}</span>
+                <span><i class="fas fa-tag"></i>{{ announcement.get_category_display }}</span>
+              </div>
+
+              <!-- Content -->
+              <div>
+                {{ announcement.content|safe }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="td_height_120 td_height_lg_80"></div>
+  </div>
+</section>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content td_radius_10">
+      <div class="modal-header">
+        <h5 class="modal-title td_fs_24 td_medium">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="td_fs_18">Are you sure you want to delete this announcement?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium" data-bs-dismiss="modal">
+          <span class="td_btn_in td_accent_color">
+            <span>Cancel</span>
+          </span>
+        </button>
+        <form id="deleteForm" method="POST" action="{% url 'delete_announcement' announcement.announcement_id %}">
+          {% csrf_token %}
+          <button type="submit" class="td_btn td_style_1 td_radius_10 td_medium delete-confirm-btn">
+            <span class="td_btn_in td_white_color td_error_bg">
+              <span>Delete</span>
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin/announcement_details.js' %}"></script>
+<script>
+$(document).ready(function() {
+  // Set the correct delete URL when delete button is clicked
+  $('.delete-announcement').click(function() {
+    const announcementId = $(this).data('announcement-id');
+    $('#deleteForm').attr('action', `/accounts/admin/announcement/${announcementId}/delete/`);
+  });
+
+  // Handle form submission with AJAX to prevent page reload and handle errors
+  $('#deleteForm').on('submit', function(e) {
+    e.preventDefault();
+    const form = $(this);
+    const url = form.attr('action');
+    const csrfToken = form.find('[name=csrfmiddlewaretoken]').val();
+
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: form.serialize(),
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
+      success: function(response) {
+        // Redirect to announcements page on successful deletion
+        window.location.href = '{% url "admin_announcements" %}';
+      },
+      error: function(xhr, status, error) {
+        // Show error message if deletion fails
+        alert('Error deleting announcement: ' + (xhr.responseText || 'Unknown error'));
+      }
+    });
+  });
+});
+</script>
+{% endblock %} 

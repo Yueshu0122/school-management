@@ -2,25 +2,93 @@
 
 {% block title %}我的成绩{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* 表格美化样式 */
+    .table-container {
+        overflow-x: auto;
+        padding: 10px;
+        margin: 0 -10px;
+    }
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 900px; /* 确保表格有最小宽度 */
+    }
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+        color: var(--td-heading-color); /* 与页面风格一致的字体颜色 */
+    }
+    .table th {
+        background-color: #2c3e50; /* 深色背景提高对比度 */
+        color: #ffffff; /* 纯白色文字 */
+        font-weight: 600; /* 增加字体粗细 */
+        padding: 12px 10px;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* 添加文字阴影增强可读性 */
+        letter-spacing: 0.5px; /* 增加字母间距 */
+    }
+    .table thead th {
+        border-bottom: 2px solid #1abc9c; /* 添加下边框强调 */
+    }
+    .table thead th:first-child {
+        border-top-left-radius: 8px;
+    }
+    .table thead th:last-child {
+        border-top-right-radius: 8px;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(var(--td-accent-rgb), 0.05);
+    }
+    .table tbody tr:nth-child(odd) {
+        background-color: rgba(var(--td-accent-rgb), 0.02);
+    }
+    .table td {
+        padding: 12px 10px;
+    }
+    .dashboard-link {
+        display: inline-block;
+        cursor: pointer;
+        position: relative;
+        z-index: 25;
+        pointer-events: auto !important;
+    }
+    .dashboard-link .td_btn_in {
+        pointer-events: auto !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- 额外添加顶部间距，避免base.html中的元素遮挡 -->
+<div style="height: 35px;"></div>
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>我的成绩</h2>
-            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> 返回仪表盘
-            </a>
+            <h2 class="td_fs_36 td_medium">我的成绩</h2>
+            <div class="header-actions">
+                <a href="{% url 'student_dashboard' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium dashboard-link">
+                    <span class="td_btn_in td_accent_color">
+                        <i class="fas fa-arrow-left me-2"></i><span>Return to Home Page</span>
+                    </span>
+                </a>
+            </div>
         </div>
 
-        <div class="card">
+        <div class="card td_radius_10 td_gray_bg_5">
+            <div class="card-header">
+                <h4 class="mb-0 td_fs_24 td_medium">成绩列表</h4>
+            </div>
             <div class="card-body">
                 {% if grades %}
-                    <div class="table-responsive">
+                    <div class="table-container">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>课程编号</th>
-                                    <th>课程名称</th>
+                                    <th>Course Number</th>
+                                    <th>Course Name</th>
                                     <th>期末考试</th>
                                     <th>作业成绩</th>
                                     <th>平时测验</th>
@@ -44,7 +112,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-center text-muted">暂无成绩信息</p>
+                    <p class="text-center text-muted td_fs_18">暂无成绩信息</p>
                 {% endif %}
             </div>
         </div>

@@ -5,10 +5,11 @@ from django.utils import timezone
 # 添加自定义用户管理器
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
-        if not username:
-            raise ValueError('用户名是必填项')
         if not email:
             raise ValueError('邮箱是必填项')
+        
+        # 确保用户名和邮箱相同
+        username = email
         
         email = self.normalize_email(email)
         user = self.model(username=username, email=email, **extra_fields)
@@ -21,8 +22,13 @@ class CustomUserManager(BaseUserManager):
         
         return self.create_user(username, email, password, **extra_fields)
     
-    def get_by_natural_key(self, username):
-        return self.get(username=username)
+    def get_by_natural_key(self, username_or_email):
+        # 尝试通过电子邮件查找用户
+        try:
+            return self.get(email=username_or_email)
+        except self.model.DoesNotExist:
+            # 如果通过邮箱找不到用户，则尝试通过用户名查找
+            return self.get(username=username_or_email)
 
 # CustomUser 模型，严格按照 ER 图中的字段：
 class CustomUser(AbstractBaseUser, PermissionsMixin):

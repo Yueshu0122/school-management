@@ -7,6 +7,8 @@ The `urlpatterns` list routes URLs to views. For more information please see:
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
+from django.conf import settings
+from django.conf.urls.static import static
 import logging
 
 # 设置日志记录器
@@ -35,6 +37,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('grades/', include('grades.urls')),  # 添加grades的web视图URL
     path('common/', include('common.urls')),  # 添加common的URL配置
+    path('announcements/', include('announcements.urls')),  # 添加announcements的web视图URL
     
     # API URL
     path('api/accounts/', include('accounts.api_urls')),
@@ -47,4 +50,9 @@ urlpatterns = [
 
 # 记录 urlpatterns 已加载
 logger.debug(f"urlpatterns 已加载，包含 {len(urlpatterns)} 个路径")
+
+# 在开发环境中提供静态文件和媒体文件
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

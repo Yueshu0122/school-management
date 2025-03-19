@@ -1,35 +1,213 @@
 {% extends 'teacher/base.html' %}
+{% load static %}
 
-{% block title %}课程管理{% endblock %}
+{% block title %}Course Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Table enhancement styles */
+    .table-container {
+        overflow-x: auto;
+        padding: 10px;
+        margin: 0 -10px;
+    }
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 900px; /* Ensure table has minimum width */
+    }
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+        color: var(--td-heading-color); /* 与页面风格一致的字体颜色 */
+    }
+    .table th {
+        background-color: #2c3e50; /* 深色背景提高对比度 */
+        color: #ffffff; /* 纯白色文字 */
+        font-weight: 600; /* 增加字体粗细 */
+        padding: 12px 10px;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* 添加文字阴影增强可读性 */
+        letter-spacing: 0.5px; /* 增加字母间距 */
+    }
+    .table thead th {
+        border-bottom: 2px solid #1abc9c; /* 添加下边框强调 */
+    }
+    .table thead th:first-child {
+        border-top-left-radius: 8px;
+    }
+    .table thead th:last-child {
+        border-top-right-radius: 8px;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(var(--td-accent-rgb), 0.05);
+    }
+    .table tbody tr:nth-child(odd) {
+        background-color: rgba(var(--td-accent-rgb), 0.02);
+    }
+    .table td {
+        padding: 12px 10px;
+    }
+    .dashboard-link {
+        display: inline-block;
+        cursor: pointer;
+        position: relative;
+        z-index: 25; /* 降低z-index，确保不会阻挡模态框 */
+        pointer-events: auto !important;
+    }
+    .dashboard-link .td_btn_in {
+        pointer-events: auto !important;
+    }
+    /* 保证返回按钮可点击 - 增强版 */
+    .header-actions {
+        position: relative;
+        z-index: 30; /* 降低z-index，确保不会阻挡模态框 */
+    }
+    /* 确保模态框正常显示 */
+    .modal-backdrop {
+        z-index: 50 !important;
+    }
+    .modal {
+        z-index: 60 !important;
+    }
+    .modal-dialog {
+        z-index: 70 !important;
+    }
+    /* 确保按钮可点击 */
+    .header-actions button {
+        position: relative;
+        z-index: 25;
+        pointer-events: auto !important;
+    }
+    .header-actions button .td_btn_in {
+        pointer-events: auto !important;
+    }
+
+    /* 修复前端遮挡问题 */
+    .td_preloader, .td_scrollup {
+        z-index: 1000 !important;
+    }
+
+    /* 解决粘性头部可能导致的问题 */
+    .td_sticky_header {
+        z-index: 40 !important;
+    }
+
+    /* 确保模态框在所有元素之上 */
+    .modal-backdrop {
+        z-index: 1050 !important;
+    }
+    .modal {
+        z-index: 1060 !important;
+    }
+    .modal-dialog {
+        z-index: 1070 !important;
+    }
+
+    /* 确保按钮真正可点击 */
+    .header-actions a,
+    .header-actions button {
+        position: relative;
+        z-index: 30;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+    }
+    .header-actions a *,
+    .header-actions button * {
+        pointer-events: auto !important;
+    }
+
+    /* 强制模态框内容可见 */
+    #addCourseModal, #addMajorModal {
+        display: none;
+    }
+    #addCourseModal.show, #addMajorModal.show {
+        display: block;
+    }
+
+    /* 直接样式按钮添加内联事件 */
+    [data-bs-target="#addCourseModal"],
+    [data-bs-target="#addMajorModal"] {
+        cursor: pointer !important;
+    }
+
+    /* 修复前端遮挡问题 */
+    .td_preloader, .td_scrollup {
+        z-index: 1000 !important;
+    }
+
+    /* 解决粘性头部可能导致的问题 */
+    .td_sticky_header {
+        z-index: 40 !important;
+    }
+
+    /* 确保页面主体内容不被头部遮挡 */
+    .main-content {
+        position: relative;
+        padding-top: 20px; /* 增加顶部内边距 */
+        margin-top: 10px; /* 增加顶部外边距 */
+    }
+
+    /* 增加header-actions区域的可见性和可点击性 */
+    .header-actions {
+        position: relative;
+        z-index: 45; /* 比粘性头部高一点 */
+        margin-top: 10px; /* 增加顶部边距 */
+        padding: 5px; /* 增加内边距使点击区域更大 */
+    }
+
+    /* 增强按钮样式 */
+    .action-button {
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+        margin-bottom: 5px !important;
+        position: relative !important;
+        z-index: 999 !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 {% csrf_token %}
+<!-- 额外添加顶部间距，避免base.html中的元素遮挡 -->
+<div style="height: 45px;"></div>
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>课程管理</h2>
-            <div>
-                <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addMajorModal">
-                    <i class="fas fa-plus"></i> 添加专业
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">
-                    <i class="fas fa-plus"></i> 添加课程
+            <h2 class="td_fs_36 td_medium">Course Management</h2>
+            <div class="header-actions" style="z-index:999 !important; position: relative;">
+                <a href="{% url 'teacher_dashboard' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium dashboard-link me-2 action-button">
+                    <span class="td_btn_in td_accent_color">
+                        <i class="fas fa-arrow-left me-2"></i><span>Return to Home Page</span>
+                    </span>
+                </a>
+                <button type="button" class="td_btn td_style_1 td_radius_10 td_medium action-button"
+                        onclick="javascript:document.getElementById('addCourseModal').classList.add('show');document.getElementById('addCourseModal').style.display='block';document.body.classList.add('modal-open');document.body.style.overflow='hidden';document.body.appendChild(document.createElement('div')).className='modal-backdrop fade show';">
+                    <span class="td_btn_in td_white_color td_accent_bg">
+                        <i class="fas fa-plus me-2"></i><span>Add Course</span>
+                    </span>
                 </button>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card td_radius_10 td_gray_bg_5">
+            <div class="card-header">
+                <h4 class="mb-0 td_fs_24 td_medium">Course List</h4>
+            </div>
             <div class="card-body">
                 {% if courses %}
-                    <div class="table-responsive">
+                    <div class="table-container">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>课程编号</th>
-                                    <th>课程名称</th>
-                                    <th>学分</th>
-                                    <th>学院</th>
-                                    <th>操作</th>
+                                    <th>Course Number</th>
+                                    <th>Course Name</th>
+                                    <th>Credits</th>
+                                    <th>Major Number</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -38,13 +216,17 @@
                                     <td>{{ course.course_id }}</td>
                                     <td>{{ course.course_name }}</td>
                                     <td>{{ course.credits }}</td>
-                                    <td>{{ course.college_id }}</td>
+                                    <td>{{ course.major_id }}</td>
                                     <td>
-                                        <a href="{% url 'manage_grades' course.course_id %}" class="btn btn-info btn-sm">
-                                            <i class="fas fa-graduation-cap"></i> 成绩管理
+                                        <a href="{% url 'manage_grades' course.course_id %}" class="td_btn td_style_1 td_radius_10 td_medium btn-sm me-1">
+                                            <span class="td_btn_in td_white_color td_accent_bg">
+                                                <i class="fas fa-graduation-cap me-1"></i><span>Grade Management</span>
+                                            </span>
                                         </a>
-                                        <a href="{% url 'manage_course_students' course.course_id %}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-users"></i> 学生管理
+                                        <a href="{% url 'manage_course_students' course.course_id %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium btn-sm">
+                                            <span class="td_btn_in td_accent_color">
+                                                <i class="fas fa-users me-1"></i><span>Student Management</span>
+                                            </span>
                                         </a>
                                     </td>
                                 </tr>
@@ -53,7 +235,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-center text-muted">暂无课程</p>
+                    <p class="text-center text-muted td_fs_18">暂无课程</p>
                 {% endif %}
             </div>
         </div>
@@ -63,35 +245,44 @@
 <!-- Add Course Modal -->
 <div class="modal fade" id="addCourseModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content td_radius_10">
             <div class="modal-header">
-                <h5 class="modal-title">添加新课程</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                <h5 class="modal-title td_fs_24 td_medium">添加新课程</h5>
+                <button type="button" class="btn-close" onclick="closeCustomModal('addCourseModal')" aria-label="关闭"></button>
             </div>
             <div class="modal-body">
                 <form id="addCourseForm">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="course_id" class="form-label">课程编号</label>
-                        <input type="number" class="form-control" id="course_id" name="course_id" required>
+                        <label for="course_id" class="form-label td_medium">Course Number</label>
+                        <input type="number" class="td_form_field td_medium td_white_bg" id="course_id" name="course_id" required>
+                        <small class="form-text text-muted">请输入唯一的Course Number，该编号在系统中不存在</small>
                     </div>
                     <div class="mb-3">
-                        <label for="course_name" class="form-label">课程名称</label>
-                        <input type="text" class="form-control" id="course_name" name="course_name" required>
+                        <label for="course_name" class="form-label td_medium">Course Name</label>
+                        <input type="text" class="td_form_field td_medium td_white_bg" id="course_name" name="course_name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="credits" class="form-label">学分</label>
-                        <input type="number" class="form-control" id="credits" name="credits" required min="1" max="6">
+                        <label for="credits" class="form-label td_medium">Credits</label>
+                        <input type="number" class="td_form_field td_medium td_white_bg" id="credits" name="credits" required min="1" max="6">
                     </div>
                     <div class="mb-3">
-                        <label for="college_id" class="form-label">学院编号</label>
-                        <input type="number" class="form-control" id="college_id" name="college_id" required>
+                        <label for="major_id" class="form-label td_medium">Major Number</label>
+                        <input type="number" class="td_form_field td_medium td_white_bg" id="major_id" name="major_id" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" id="saveCourse">保存课程</button>
+                <button type="button" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium" onclick="closeCustomModal('addCourseModal')">
+                    <span class="td_btn_in td_accent_color">
+                        <span>Cancel</span>
+                    </span>
+                </button>
+                <button type="button" class="td_btn td_style_1 td_radius_10 td_medium" id="saveCourse">
+                    <span class="td_btn_in td_white_color td_accent_bg">
+                        <span>Save Course</span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -100,46 +291,93 @@
 <!-- Add Major Modal -->
 <div class="modal fade" id="addMajorModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">添加新专业</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addMajorForm">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="major_id" class="form-label">专业编号</label>
-                        <input type="number" class="form-control" id="major_id" name="major_id" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="major_name" class="form-label">专业名称</label>
-                        <input type="text" class="form-control" id="major_name" name="major_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="major_college_id" class="form-label">学院编号</label>
-                        <input type="number" class="form-control" id="major_college_id" name="college_id" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" id="saveMajor">保存专业</button>
-            </div>
-        </div>
+
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+// 定义关闭模态框的函数
+function closeCustomModal(modalId) {
+    // 移除模态框的显示类
+    document.getElementById(modalId).classList.remove('show');
+    document.getElementById(modalId).style.display = 'none';
+
+    // 移除body上的modal-open类和内联样式
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+
+    // 移除背景遮罩
+    const backdrops = document.getElementsByClassName('modal-backdrop');
+    if (backdrops.length > 0) {
+        Array.from(backdrops).forEach(backdrop => {
+            backdrop.parentNode.removeChild(backdrop);
+        });
+    }
+}
+
 $(document).ready(function() {
+
+    const addMajorBtn = document.querySelector('[data-bs-target="#addMajorModal"]');
+    if (addMajorBtn) {
+        addMajorBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const addMajorModal = new bootstrap.Modal(document.getElementById('addMajorModal'));
+            addMajorModal.show();
+        });
+    }
+
+    const addCourseBtn = document.querySelector('[data-bs-target="#addCourseModal"]');
+    if (addCourseBtn) {
+        addCourseBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const addCourseModal = new bootstrap.Modal(document.getElementById('addCourseModal'));
+            addCourseModal.show();
+        });
+    }
+
+    // 原有的保存事件处理代码
     $('#saveCourse').click(function() {
+        const course_id = $('#course_id').val();
+        const course_name = $('#course_name').val();
+        const credits = $('#credits').val();
+        const major_id = $('#major_id').val();
+
+        // 前端验证
+        if (!course_id || !course_name || !credits || !major_id) {
+            alert('Please fill in all the required fields.');
+            return;
+        }
+
+        // 首先检查课程ID是否已存在
+        $.ajax({
+            url: '/accounts/check_course_id_exists/',
+            method: 'GET',
+            data: { course_id: course_id },
+            success: function(response) {
+                if (response.exists) {
+                    // 如果ID已存在，显示错误消息
+                    alert('错误: 课程ID ' + course_id + ' 已存在，请使用其他ID');
+                } else {
+                    // ID不存在，可以创建课程
+                    submitCourseForm(course_id, course_name, credits, major_id);
+                }
+            },
+            error: function() {
+                // 如果检查失败，尝试直接提交并处理可能的错误
+                submitCourseForm(course_id, course_name, credits, major_id);
+            }
+        });
+    });
+
+    // 提取提交表单的逻辑到单独的函数
+    function submitCourseForm(course_id, course_name, credits, major_id) {
         const formData = {
-            course_id: $('#course_id').val(),
-            course_name: $('#course_name').val(),
-            credits: $('#credits').val(),
-            college_id: $('#college_id').val()
+            course_id: course_id,
+            course_name: course_name,
+            credits: credits,
+            major_id: major_id
         };
 
         $.ajax({
@@ -151,24 +389,55 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.status === 'success') {
-                    $('#addCourseModal').modal('hide');
+                    // 成功创建课程
+                    closeCustomModal('addCourseModal');
+                    alert('课程创建成功');
                     location.reload();
                 } else {
-                    alert('创建课程失败: ' + response.message);
+                    // 处理具体错误
+                    if (response.message && response.message.includes('Duplicate entry')) {
+                        alert('错误: 课程ID ' + course_id + ' 已经存在，请使用其他ID');
+                    } else {
+                        alert('创建课程失败: ' + response.message);
+                    }
                 }
             },
             error: function(xhr) {
-                alert('创建课程失败: ' + (xhr.responseJSON ? xhr.responseJSON.message : '未知错误'));
+                // 处理错误响应
+                let errorMsg = '创建课程失败';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    // 尝试解析错误信息
+                    const errMsg = xhr.responseJSON.message;
+                    if (errMsg.includes('Duplicate entry')) {
+                        errorMsg = '错误: 课程ID ' + course_id + ' 已经存在，请使用其他ID';
+                    } else {
+                        errorMsg += ': ' + errMsg;
+                    }
+                }
+
+                alert(errorMsg);
             }
         });
-    });
+    }
 
     $('#saveMajor').click(function() {
         const formData = {
             major_id: $('#major_id').val(),
             major_name: $('#major_name').val(),
-            college_id: $('#major_college_id').val()
+            major_id: $('#major_major_id').val()
         };
+
+      // Front-end validation
+        if (!formData.major_id || !formData.major_name || !formData.major_id) {
+            alert('Please fill in all the required fields.');
+            return;
+        }
+
+
+        const $saveBtn = $(this);
+        $saveBtn.prop('disabled', true);
+        $saveBtn.find('span span').text('Saving...');
 
         $.ajax({
             url: '/common/major/create/',
@@ -178,14 +447,25 @@ $(document).ready(function() {
                 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
             },
             success: function(response) {
+                $saveBtn.prop('disabled', false);
+                $saveBtn.find('span span').text('保存专业');
+
                 if (response.status === 'success') {
-                    $('#addMajorModal').modal('hide');
-                    alert('专业创建成功');
+                   // Force close the modal
+                    closeCustomModal('addMajorModal');
+
+         // Use setTimeout to ensure the modal is closed before displaying the success message
+                    setTimeout(function() {
+                        alert('专业创建成功');
+                        location.reload(); // 刷新页面以确保UI更新
+                    }, 300);
                 } else {
                     alert('创建专业失败: ' + response.message);
                 }
             },
             error: function(xhr) {
+                $saveBtn.prop('disabled', false);
+                $saveBtn.find('span span').text('保存专业');
                 alert('创建专业失败: ' + (xhr.responseJSON ? xhr.responseJSON.message : '未知错误'));
             }
         });
@@ -195,6 +475,44 @@ $(document).ready(function() {
     $('#addCourseModal, #addMajorModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
+
+    // Add CourseID实时检查
+    $('#course_id').on('blur', function() {
+        const courseId = $(this).val();
+        if (courseId && courseId.trim() !== '') {
+            const idStatus = $(this).next('small');
+
+            // 如果没有状态显示元素，添加一个
+            let statusElement = idStatus.next('.id-status');
+            if (statusElement.length === 0) {
+                idStatus.after('<div class="id-status mt-1"></div>');
+                statusElement = idStatus.next('.id-status');
+            }
+
+            // 显示检查中状态
+            statusElement.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> 正在检查ID是否可用...</span>');
+
+            // 向后端发送请求检查ID
+            $.ajax({
+                url: '/accounts/check_course_id_exists/',
+                method: 'GET',
+                data: { course_id: courseId },
+                success: function(response) {
+                    if (response.exists) {
+                        // ID已存在
+                        statusElement.html('<span class="text-danger"><i class="fas fa-times-circle"></i> 此课程ID已存在，请使用其他ID</span>');
+                    } else {
+                        // ID可用
+                        statusElement.html('<span class="text-success"><i class="fas fa-check-circle"></i> 此课程ID可用</span>');
+                    }
+                },
+                error: function() {
+                    // 检查失败
+                    statusElement.html('<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> 无法检查ID，请确保输入唯一的ID</span>');
+                }
+            });
+        }
+    });
 });
 </script>
-{% endblock %} 
+{% endblock %}

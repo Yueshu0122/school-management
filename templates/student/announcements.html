@@ -1,40 +1,75 @@
 {% extends 'student/base.html' %}
+{% load static %}
 
-{% block title %}公告列表{% endblock %}
+{% block title %}Announcements{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>公告列表</h2>
-            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> 返回仪表盘
-            </a>
+<!-- Start Blog List -->
+<section>
+  <div class="td_height_120 td_height_lg_80"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="td_fs_36 td_medium">Announcements</h2>
+          <a href="{% url 'student_dashboard' %}" class="td_btn td_style_1 td_type_3 td_radius_30 td_medium">
+            <span class="td_btn_in td_accent_color">
+              <i class="fa-solid fa-arrow-left me-2"></i><span>Back to Dashboard</span>
+            </span>
+          </a>
         </div>
-
-        {% if announcements %}
-            <div class="row">
-                {% for announcement in announcements %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">{{ announcement.title }}</h5>
-                                <small class="text-muted">
-                                    发布于 {{ announcement.publish_date|date:"Y年m月d日" }}
-                                </small>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ announcement.content }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> 暂无公告
-            </div>
-        {% endif %}
+      </div>
     </div>
-</div>
+    
+    {% if announcements %}
+    <div class="row td_gap_y_30">
+      {% for announcement in announcements %}
+      <div class="col-lg-4">
+        <div class="td_post td_style_1">
+          <a href="{% url 'student_announcement_details' announcement.announcement_id %}" class="td_post_thumb d-block">
+            {% if announcement.image %}
+            <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}">
+            {% else %}
+            <img src="{% static 'assets/img/Background1.png' %}" alt="">
+            {% endif %}
+            <i class="fa-solid fa-link"></i>
+          </a>
+          <div class="td_post_info">
+            <div class="td_post_meta td_fs_14 td_medium td_mb_20">
+              <span><img src="{% static 'assets/img/icons/calendar.svg' %}" alt="">{{ announcement.publish_date|date:"F d, Y" }}</span>
+            </div>
+            <h2 class="td_post_title td_fs_24 td_medium td_mb_16">
+              <a href="{% url 'student_announcement_details' announcement.announcement_id %}">{{ announcement.title }}</a>
+            </h2>
+            <p class="td_post_subtitle td_mb_24 td_heading_color td_opacity_7">By {{ announcement.author.username }}</p>
+            <p class="td_post_subtitle td_mb_24 td_heading_color">{{ announcement.content|truncatechars:100 }}</p>
+            <a href="{% url 'student_announcement_details' announcement.announcement_id %}" class="td_btn td_style_1 td_type_3 td_radius_30 td_medium">
+              <span class="td_btn_in td_accent_color">
+                <span>View Details</span>
+              </span>             
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+      <div class="col-12">
+        <div class="td_post td_style_1 p-4">
+          <div class="td_post_info text-center">
+            <h2 class="td_post_title td_fs_24 td_medium td_mb_16">
+              <i class="fa-solid fa-info-circle me-2"></i>No Announcements
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="td_height_60 td_height_lg_40"></div>
+  </div>
+  <div class="td_height_120 td_height_lg_80"></div>
+</section>
+<!-- End Blog List -->
 {% endblock %} 

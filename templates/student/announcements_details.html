@@ -1,0 +1,60 @@
+{% extends 'student/base.html' %}
+
+{% load static %}
+
+{% block title %}Announcement Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/announcement_details.css' %}">
+{% endblock %}
+
+{% block content %}
+<section>
+  <div class="td_height_120 td_height_lg_80"></div>
+  <div class="container">
+    <div class="row td_gap_y_50">
+      <div class="col-12">
+        <div class="td_blog_details_wrap">
+          <div class="mb-4 d-flex justify-content-end align-items-center">
+            <a href="{% url 'student_announcements' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium me-2">
+              <span class="td_btn_in td_accent_color">
+                <i class="fas fa-arrow-left me-2"></i><span>Back to Announcements</span>
+              </span>
+            </a>
+          </div>
+
+          <div class="td_blog_details">
+            <!-- Announcement image -->
+            <div class="td_blog_details_img mb-4">
+              <img src="{{ announcement.image.url|default:'/static/assets/img/Background1.png' }}"
+                   alt="{{ announcement.title|default:'Announcement Image' }}"
+                   class="announcement-image">
+            </div>
+
+            <!-- Announcement information -->
+            <div class="td_blog_details_info">
+              <h1>{{ announcement.title }}</h1>
+              <!-- Announcement metadata -->
+              <div class="td_blog_details_meta">
+                <span><i class="far fa-calendar-alt"></i>{{ announcement.publish_date|date:"F d, Y" }}</span>
+                <span><i class="far fa-user"></i>{{ announcement.author }}</span>
+                <span><i class="fas fa-tag"></i>{{ announcement.get_category_display }}</span>
+              </div>
+
+              <!-- Content -->
+              <div>
+                {{ announcement.content|safe }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="td_height_120 td_height_lg_80"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/announcement_details.js' %}"></script>
+{% endblock %}

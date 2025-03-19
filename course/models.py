@@ -11,13 +11,13 @@ class Course(models.Model):
       - Course_ID (PK)
       - Course_Name
       - Credits
-      - College_ID (integer, no actual College table)
+      - Major_ID (integer, no actual College table)
       - Teacher_ID (FK -> Teacher)
     """
     course_id = models.IntegerField(primary_key=True)
     course_name = models.CharField(max_length=60)
     credits = models.IntegerField()
-    college_id = models.IntegerField()
+    major_id = models.IntegerField()
     teacher = models.ForeignKey(
         'accounts.Teacher',
         on_delete=models.CASCADE,

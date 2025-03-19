@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from accounts.models import Teacher, Student  # 请确保 Teacher 和 Student 模型已正确定义
+from accounts.models import Teacher, Student, CustomUser  # 请确保 Teacher 和 Student 模型已正确定义
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -36,120 +36,134 @@ def login_view(request):
         return redirect('index')
         
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')  # 改为使用email字段
         password = request.POST.get('password')
         
-        # 检查用户是否存在
-        if not User.objects.filter(username=username).exists():
-            messages.error(request, f"用户名 '{username}' 不存在。请检查拼写或注册一个新账户。")
-            return render(request, 'login.html')
-        
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            messages.success(request, f"欢迎回来，{user.username}！")
+        # 尝试通过邮箱查找用户
+        try:
+            user = CustomUser.objects.get(email=email)
+            username = user.username
+            # 使用authenticate验证密码
+            user = authenticate(request, username=username, password=password)
             
-            # 根据用户角色重定向到不同页面
-            if user.role == 'teacher':
-                return redirect('teacher_dashboard')
-            elif user.role == 'student':
-                return redirect('student_dashboard')
-            elif user.role == 'admin':
-                return redirect('admin_dashboard')
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome，{user.username}！')
+                
+                # 根据用户角色重定向到不同页面
+                if user.role == 'teacher':
+                    return redirect('teacher_dashboard')
+                elif user.role == 'student':
+                    return redirect('student_dashboard')
+                elif user.role == 'admin':
+                    return redirect('admin_dashboard')
+                else:
+                    return redirect('index')
+            else:
+                messages.error(request, '邮箱或密码不正确。')
+        except CustomUser.DoesNotExist:
+            messages.error(request, '该邮箱未注册。')
             
-            # 如果不是教师、学生或管理员，获取 next 参数，如果没有则默认重定向到 index
-            next_url = request.GET.get('next', 'index')
-            return redirect(next_url)
-        else:
-            messages.error(request, "密码不正确。请重试或点击'忘记密码'链接重置密码。")
-    
-    # 确保模板存在
-    try:
-        return render(request, 'login.html')
-    except Exception as e:
-        print(f"渲染模板时出错: {e}")
-        # 返回一个简单的响应，以便调试
-        return HttpResponse(f"登录页面渲染失败: {e}")
+    return render(request, 'login.html')
 
 def register_view(request):
-    # If user is already authenticated, redirect to dashboard
     if request.user.is_authenticated:
         return redirect('index')
         
     if request.method == 'POST':
-        user_id = random.randint(10000, 99999)  # Generate a random user_id
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        email = request.POST.get('email')
-        role = request.POST.get('role', 'student')
-        
-        # Additional fields based on role
+        # 获取基本信息
         full_name = request.POST.get('full_name')
         phone_no = request.POST.get('phone_no')
+        email = request.POST.get('email')
+        # 将邮箱作为用户名
+        username = email
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        role = request.POST.get('role')
         
-        # Check if username already exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-            return render(request, 'register.html')
+        # 检查密码是否匹配
+        if password != confirm_password:
+            messages.error(request, '密码不匹配')
+            return redirect('register')
+            
+        # 检查邮箱是否已存在
+        if User.objects.filter(email=email).exists():
+            messages.error(request, '该邮箱已注册')
+            return redirect('register')
         
         try:
-            # Create the user
-            user = User.objects.create(
-                user_id=user_id,
-                username=username,
-                email=email,
-                role=role
-            )
-            user.set_password(password)  # 正确设置密码
-            user.save()
+            # 生成新的用户ID
+            latest_user = User.objects.order_by('-user_id').first()
+            new_user_id = 1 if latest_user is None else latest_user.user_id + 1
             
-            # Create corresponding Student or Teacher record
             if role == 'student':
-                student_id = random.randint(100000, 999999)
+                # 获取学生额外信息
+                degree_programme = request.POST.get('degree_programme')
+                year_of_study = request.POST.get('year_of_study')
+                
+                # 生成新学生ID
+                latest_student = Student.objects.order_by('-student_id').first()
+                new_student_id = 1 if latest_student is None else latest_student.student_id + 1
+                
+                # 创建学生记录
                 student = Student.objects.create(
-                    student_id=student_id,
-                    full_name=full_name,
+                    student_id=new_student_id,
+                    full_name=full_name,  # 保存全名
                     phone_no=phone_no,
                     email=email,
-                    degree_programme=request.POST.get('degree_programme', 'Not specified'),
-                    year_of_study=int(request.POST.get('year_of_study', 1)),
-                    gpa=float(request.POST.get('gpa', 0.0)),
-                    enrollment_status='Active'
+                    degree_programme=degree_programme,
+                    year_of_study=year_of_study,
+                    gpa=0.0,  # 默认值
+                    enrollment_status='Active'  # 默认值
                 )
-                # Link the user to the student
-                user.linked_id = student_id
-                user.save()
                 
-                # Add to Student group
-                group, _ = Group.objects.get_or_create(name='Student')
-                user.groups.add(group)
+                # 创建用户记录与学生关联，使用邮箱作为用户名
+                user = User.objects.create_user(
+                    user_id=new_user_id,
+                    username=username,  # 使用邮箱作为用户名
+                    email=email,
+                    password=password,
+                    role='student',
+                    linked_id=student.student_id
+                )
                 
             elif role == 'teacher':
-                teacher_id = random.randint(100000, 999999)
-                teacher = Teacher.objects.create(
-                    teacher_id=teacher_id,
-                    full_name=full_name,
-                    phone_no=phone_no,
-                    email=email,
-                    title=request.POST.get('title', 'Lecturer'),
-                    department=request.POST.get('department', 'Not specified'),
-                    office_location=request.POST.get('office_location', 'Not specified')
-                )
-                # Link the user to the teacher
-                user.linked_id = teacher_id
-                user.save()
+                # 获取教师额外信息
+                title = request.POST.get('title')
+                department = request.POST.get('department')
+                office_location = request.POST.get('office_location')
                 
-                # Add to Teacher group
-                group, _ = Group.objects.get_or_create(name='Teacher')
-                user.groups.add(group)
+                # 生成新教师ID
+                latest_teacher = Teacher.objects.order_by('-teacher_id').first()
+                new_teacher_id = 1 if latest_teacher is None else latest_teacher.teacher_id + 1
+                
+                # 创建教师记录
+                teacher = Teacher.objects.create(
+                    teacher_id=new_teacher_id,
+                    full_name=full_name,  # 保存全名
+                    email=email,
+                    phone_no=phone_no,
+                    title=title,
+                    department=department,
+                    office_location=office_location
+                )
+                
+                # 创建用户记录与教师关联，使用邮箱作为用户名
+                user = User.objects.create_user(
+                    user_id=new_user_id,
+                    username=username,  # 使用邮箱作为用户名
+                    email=email,
+                    password=password,
+                    role='teacher',
+                    linked_id=teacher.teacher_id
+                )
             
-            messages.success(request, "Registration successful! Please login.")
+            messages.success(request, '注册成功，请登录')
             return redirect('login')
             
         except Exception as e:
-            messages.error(request, f"Error during registration: {str(e)}")
-    
+            messages.error(request, f'注册失败: {str(e)}')
+            
     return render(request, 'register.html')
 
 def logout_view(request):
@@ -327,7 +341,7 @@ def create_course(request):
             course_id=request.POST['course_id'],
             course_name=request.POST['course_name'],
             credits=request.POST['credits'],
-            college_id=request.POST['college_id'],
+            major_id=request.POST['major_id'],
             teacher_id=request.user.linked_id
         )
         return JsonResponse({'status': 'success', 'course_id': course.course_id})
@@ -412,7 +426,7 @@ def create_announcement(request):
             last_announcement = Announcement.objects.order_by('-announcement_id').first()
             new_id = (last_announcement.announcement_id + 1) if last_announcement else 1
             
-            # 创建公告
+            # Create Announcement
             announcement = Announcement.objects.create(
                 announcement_id=new_id,
                 title=title,
@@ -456,3 +470,17 @@ def delete_announcement(request, announcement_id):
     except Exception as e:
         messages.error(request, f'Error deleting announcement: {str(e)}')
     return redirect('admin_announcements')
+
+# 学生查看公告详情
+@login_required
+@user_passes_test(is_student)
+def student_announcement_details(request, announcement_id):
+    announcement = get_object_or_404(Announcement, announcement_id=announcement_id)
+    return render(request, 'student/announcement_details.html', {'announcement': announcement})
+
+# 管理员查看公告详情
+@login_required
+@user_passes_test(is_admin)
+def admin_announcement_details(request, announcement_id):
+    announcement = get_object_or_404(Announcement, announcement_id=announcement_id)
+    return render(request, 'admin/announcement_details.html', {'announcement': announcement})

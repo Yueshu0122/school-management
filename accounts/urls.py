@@ -5,7 +5,8 @@ from .views import (
     manage_courses, create_course, view_announcements,
     student_dashboard, student_grades, student_announcements,
     admin_dashboard, admin_announcements, create_announcement,
-    edit_announcement, delete_announcement
+    edit_announcement, delete_announcement,
+    student_announcement_details, admin_announcement_details
 )
 
 urlpatterns = [
@@ -27,6 +28,7 @@ urlpatterns = [
     path('student/dashboard/', student_dashboard, name='student_dashboard'),
     path('student/grades/', student_grades, name='student_grades'),
     path('student/announcements/', student_announcements, name='student_announcements'),
+    path('student/announcement/<int:announcement_id>/', student_announcement_details, name='student_announcement_details'),
     
     # Admin views
     path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
@@ -34,4 +36,5 @@ urlpatterns = [
     path('admin/announcement/create/', create_announcement, name='create_announcement'),
     path('admin/announcement/<int:announcement_id>/edit/', edit_announcement, name='edit_announcement'),
     path('admin/announcement/<int:announcement_id>/delete/', delete_announcement, name='delete_announcement'),
+    path('admin/announcement/<int:announcement_id>/details/', admin_announcement_details, name='admin_announcement_details'),
 ]

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Course, Grade
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ['course_id', 'course_name', 'credits', 'college_id']
+    list_display = ['course_id', 'course_name', 'credits', 'major_id']
     search_fields = ['course_id', 'course_name']
 
 class GradeAdmin(admin.ModelAdmin):

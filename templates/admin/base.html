@@ -1,50 +1,223 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}管理员门户{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}Administrator homepage{% endblock %}</title>
+    <!-- ThemeDox Styles -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/slick.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/odometer.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     {% block extra_css %}{% endblock %}
+    <style>
+        /* Custom styles to match ThemeDox theme */
+        .navbar-dark.bg-primary {
+            background-color: var(--td-accent-color) !important;
+        }
+        .btn-primary {
+            background-color: var(--td-accent-color);
+            border-color: var(--td-accent-color);
+        }
+        .btn-primary:hover {
+            background-color: var(--td-accent-hover);
+            border-color: var(--td-accent-hover);
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: var(--td-heading-bg);
+            color: var(--td-heading-color);
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+        /* Custom table styling */
+        .table-hover tbody tr:hover {
+            background-color: rgba(var(--td-accent-rgb), 0.1);
+        }
+        /* 优化导航栏样式 */
+        .td_site_branding {
+            font-size: 28px;
+            font-weight: 600;
+            padding-top: 5px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .td_main_nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .td_main_nav li {
+            margin: 0 15px;
+        }
+        .td_main_nav li a {
+            font-size: 18px;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .td_main_nav li a:hover {
+            background-color: rgba(var(--td-accent-rgb), 0.1);
+        }
+        .td_main_header_in {
+            flex-direction: column;
+            align-items: center;
+        }
+        .td_main_header_left, .td_main_header_right {
+            width: 100%;
+            text-align: center;
+        }
+        @media (min-width: 992px) {
+            .td_main_header_in {
+                padding: 10px 0;
+            }
+        }
+        
+        /* 页面布局样式 - 使页脚固定在底部 */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex: 1 0 auto;
+        }
+        .td_footer {
+            flex-shrink: 0;
+            width: 100%;
+            padding: 20px 0;
+            background-color: var(--td-gray-bg);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 表格美化样式 */
+        .table-container {
+            overflow-x: auto;
+            padding: 10px;
+            margin: 0 -10px;
+        }
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            min-width: 900px; /* 确保表格有最小宽度 */
+        }
+        .table th,
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+            color: var(--td-heading-color); /* 与页面风格一致的字体颜色 */
+        }
+        .table th {
+            background-color: #2c3e50; /* 深色背景提高对比度 */
+            color: #ffffff; /* 纯白色文字 */
+            font-weight: 600; /* 增加字体粗细 */
+            padding: 12px 10px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* 添加文字阴影增强可读性 */
+            letter-spacing: 0.5px; /* 增加字母间距 */
+        }
+        .table thead th {
+            border-bottom: 2px solid #1abc9c; /* 添加下边框强调 */
+        }
+        .table thead th:first-child {
+            border-top-left-radius: 8px;
+        }
+        .table thead th:last-child {
+            border-top-right-radius: 8px;
+        }
+        .table tbody tr:hover {
+            background-color: rgba(var(--td-accent-rgb), 0.05);
+        }
+        .table tbody tr:nth-child(odd) {
+            background-color: rgba(var(--td-accent-rgb), 0.02);
+        }
+        .table td {
+            padding: 12px 10px;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'admin_dashboard' %}">管理员门户</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admin_dashboard' %}">
-                            <i class="fas fa-home"></i> 仪表盘
+    <!-- Start Preloader -->
+    <div class="td_preloader">
+      <div class="td_preloader_in">
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <!-- End Preloader -->
+    
+    <!-- Start Header Section -->
+    <header class="td_site_header td_style_1 td_sticky_header td_medium td_heading_color">
+        <div class="td_main_header">
+            <div class="container">
+                <div class="td_main_header_in">
+                    <div class="td_main_header_left">
+                        <a class="td_site_branding td_accent_color" href="{% url 'admin_dashboard' %}">
+                            Administrator homepage
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admin_announcements' %}">
-                            <i class="fas fa-bullhorn"></i> 公告管理
+                       
+                    </div>
+                    <dir class="td_main_header_right">
+                        <a href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> log out
                         </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">
-                            <i class="fas fa-sign-out-alt"></i> 退出登录
-                        </a>
-                    </li>
-                </ul>
+                    </dir>
+                    <div class="td_main_header_left">
+                        <div class="td_nav_wrap">
+                            <div class="td_nav">
+                                <div class="td_nav_in">
+                                    <ul class="td_main_nav td_medium">
+                                        <li>
+                                            <a href="{% url 'admin_dashboard' %}">
+                                                <i class="fas fa-home"></i> 主页
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'admin_announcements' %}">
+                                                <i class="fas fa-bullhorn"></i> 公告管理
+                                            </a>
+                                        </li>
+                                        <li>
+                                        
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
+    <!-- End Header Section -->
 
-    <div class="container mt-4">
+    <div class="container main-content mt-4">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {% if message.tags == 'error' %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                    {% elif message.tags == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                    {% elif message.tags == 'info' %}
+                        <i class="fas fa-info-circle me-2"></i>
+                    {% endif %}
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" title="Close alert"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -52,8 +225,30 @@
         {% block content %}{% endblock %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Start Footer Section -->
+    <footer class="td_footer td_style_1">
+      <div class="container">
+        <div class="td_footer_bottom_in">
+
+        </div>
+      </div>
+    </footer>
+    <!-- End Footer Section -->
+
+    <!-- Start Scroll Up Button -->
+    <div class="td_scrollup">
+      <i class="fa-solid fa-arrow-up"></i>
+    </div>
+    <!-- End Scroll Up Button -->
+
+    <!-- Script -->
+    <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/odometer.js' %}"></script>
+    <script src="{% static 'assets/js/gsap.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'assets/js/wow.min.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html> 

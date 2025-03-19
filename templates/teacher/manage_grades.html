@@ -1,11 +1,16 @@
 {% extends 'teacher/base.html' %}
 
-{% block title %}成绩管理 - {{ course.course_name }}{% endblock %}
+{% block title %}Grade Management - {{ course.course_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
     .grade-input {
-        width: 80px;
+        width: 85px;
+        text-align: center;
+        margin: 0 auto;
+        display: block;
+        padding: 6px 4px;
+        height: auto;
     }
     .save-status {
         display: none;
@@ -17,35 +22,203 @@
     .save-error {
         color: #dc3545;
     }
+
+    .table-container {
+        overflow-x: auto;
+        padding: 10px;
+        margin: 0 -10px;
+    }
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 900px;
+    }
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+        color: var(--td-heading-color);
+    }
+    .table th {
+        background-color: #2c3e50;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 12px 10px;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        letter-spacing: 0.5px;
+    }
+    .table thead th {
+        border-bottom: 2px solid #1abc9c;
+    }
+    .table thead th:first-child {
+        border-top-left-radius: 8px;
+    }
+    .table thead th:last-child {
+        border-top-right-radius: 8px;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(var(--td-accent-rgb), 0.05);
+    }
+    .table tbody tr:nth-child(odd) {
+        background-color: rgba(var(--td-accent-rgb), 0.02);
+    }
+    .table td {
+        padding: 12px 10px;
+    }
+    .btn-save {
+        min-width: 90px;
+        padding: 8px 12px;
+        position: relative;
+        z-index: 1;
+    }
+    .btn-save i {
+        margin-right: 8px;
+    }
+    .dashboard-link {
+        display: inline-block;
+        cursor: pointer;
+        position: relative;
+        z-index: 25;
+        pointer-events: auto !important;
+    }
+    .dashboard-link .td_btn_in {
+        pointer-events: auto !important;
+    }
+  /* Fix the style issue with the save button */
+    .td_btn.btn-save span {
+        display: inline-flex;
+        align-items: center;
+    }
+  /* Ensure the return button is clickable - enhanced version */
+    .header-actions {
+        position: relative;
+        z-index: 30;
+    }
+  /* Ensure the modal box displays correctly */
+    .modal-backdrop {
+        z-index: 50 !important;
+    }
+    .modal {
+        z-index: 60 !important;
+    }
+    .modal-dialog {
+        z-index: 70 !important;
+    }
+  /* Make sure the button is clickable */
+    .header-actions button {
+        position: relative;
+        z-index: 25;
+        pointer-events: auto !important;
+    }
+    .header-actions button .td_btn_in {
+        pointer-events: auto !important;
+    }
+ /* Chart container styles */
+    .chart-container {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .chart-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--td-heading-color);
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+    }
+
+    .chart-tabs {
+        display: flex;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(var(--td-accent-rgb), 0.1);
+    }
+
+    .chart-tab {
+        padding: 8px 15px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px 5px 0 0;
+        transition: all 0.3s ease;
+    }
+
+    .chart-tab.active {
+        background-color: rgba(var(--td-accent-rgb), 0.1);
+        color: var(--td-accent-color);
+        border-bottom: 2px solid var(--td-accent-color);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
+
+<div style="height: 35px;"></div>
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>{{ course.course_name }} - 成绩管理</h2>
-            <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> 返回仪表盘
-            </a>
+            <h2 class="td_fs_36 td_medium">{{ course.course_name }} - Grade Management</h2>
+            <div class="header-actions">
+                <a href="{% url 'teacher_dashboard' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium dashboard-link">
+                    <span class="td_btn_in td_accent_color">
+                        <i class="fas fa-arrow-left me-2"></i><span>Return to Home Page</span>
+                    </span>
+                </a>
+            </div>
         </div>
 
-        <div class="card">
+        <!-- add Grade Analysis diagram -->
+        <div class="card td_radius_10 td_gray_bg_5 mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 td_fs_24 td_medium">Grade Analysis</h4>
+                <div class="chart-tabs">
+                    <div class="chart-tab active" data-chart="distribution">Grade Distribution</div>
+                    <div class="chart-tab" data-chart="comparison">Item Comparison</div>
+                    <div class="chart-tab" data-chart="trend">Student Performance</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="chart-wrapper">
+                            <canvas id="gradeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-wrapper">
+                            <canvas id="summaryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card td_radius_10 td_gray_bg_5">
+            <div class="card-header">
+                <h4 class="mb-0 td_fs_24 td_medium">Grades List</h4>
+            </div>
             <div class="card-body">
                 {% if grades %}
-                    <div class="table-responsive">
+                    <div class="table-container">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>学号</th>
-                                    <th>学生姓名</th>
-                                    <th>期末考试</th>
-                                    <th>作业成绩</th>
-                                    <th>平时测验</th>
-                                    <th>出勤情况</th>
-                                    <th>绩点</th>
-                                    <th>操作</th>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Final Exam</th>
+                                    <th>Assignment Grade</th>
+                                    <th>Regular Quiz</th>
+                                    <th>Attendance</th>
+                                    <th>GPA</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,45 +227,49 @@
                                     <td>{{ grade.student.student_id }}</td>
                                     <td>{{ grade.student.full_name }}</td>
                                     <td>
-                                        <input type="number" class="form-control grade-input" 
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                name="final_exam" value="{{ grade.final_exam }}"
                                                min="0" max="100" step="0.01"
-                                               title="期末考试成绩">
+                                               title="Final exam grade">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control grade-input" 
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                name="assignments" value="{{ grade.assignments }}"
                                                min="0" max="100" step="0.01"
-                                               title="作业成绩">
+                                               title="Homework grade">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control grade-input" 
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                name="regular_quiz" value="{{ grade.regular_quiz }}"
                                                min="0" max="100" step="0.01"
-                                               title="平时测验成绩">
+                                               title="Regular quiz scores">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control grade-input" 
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                name="attendance" value="{{ grade.attendance }}"
                                                min="0" max="100" step="0.01"
-                                               title="出勤成绩">
+                                               title="Attendance grade">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control grade-input" 
-                                               name="gpa" value="{{ grade.gpa }}"
-                                               min="0" max="4" step="0.01"
-                                               title="绩点">
+                                        <span class="td_form_field td_medium td_white_bg grade-display"
+                                               id="gpa-display-{{ grade.id }}"
+                                               style="display: inline-block; width: 85px; text-align: center; padding: 6px 4px; background-color: #f8f9fa;">
+                                            {{ grade.gpa }}
+                                        </span>
+                                        <input type="hidden" name="gpa" id="gpa-{{ grade.id }}" value="{{ grade.gpa }}">
                                     </td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <button class="btn btn-primary btn-sm save-grade">
-                                                <i class="fas fa-save"></i> 保存
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <button class="td_btn td_style_1 td_radius_10 td_medium btn-sm save-grade btn-save">
+                                                <span class="td_btn_in td_white_color td_accent_bg">
+                                                    <i class="fas fa-save"></i><span>Save</span>
+                                                </span>
                                             </button>
                                             <span class="save-status save-success">
-                                                <i class="fas fa-check"></i> 已保存
+                                                <i class="fas fa-check"></i> Saved
                                             </span>
                                             <span class="save-status save-error">
-                                                <i class="fas fa-times"></i> 保存失败
+                                                <i class="fas fa-times"></i> Save failed
                                             </span>
                                         </div>
                                     </td>
@@ -102,7 +279,10 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-center text-muted">暂无学生选修此课程</p>
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
+                        <p class="text-center text-muted td_fs_18">No students have enrolled in this course yet.</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -111,20 +291,23 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- 引入Chart.js库 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 $(document).ready(function() {
-    // 验证成绩输入
+
     function validateGrade(value, min, max) {
         const num = parseFloat(value);
         return !isNaN(num) && num >= min && num <= max;
     }
 
-    // 显示保存状态
+
     function showSaveStatus(row, isSuccess, message) {
         const statusElements = row.find('.save-status');
         const successElement = row.find('.save-success');
         const errorElement = row.find('.save-error');
-        
+
         statusElements.hide();
         if (isSuccess) {
             successElement.fadeIn().delay(2000).fadeOut();
@@ -133,22 +316,55 @@ $(document).ready(function() {
         }
     }
 
+    // Update the calculateGPA function to update the display
+    function calculateGPA(row) {
+        // Get values from all input fields
+        const finalExam = parseFloat(row.find('input[name="final_exam"]').val()) || 0;
+        const assignments = parseFloat(row.find('input[name="assignments"]').val()) || 0;
+        const regularQuiz = parseFloat(row.find('input[name="regular_quiz"]').val()) || 0;
+        const attendance = parseFloat(row.find('input[name="attendance"]').val()) || 0;
+
+        // Calculate simple average
+        const average = (finalExam + assignments + regularQuiz + attendance) / 4;
+
+        // Round to 2 decimal places
+        const formattedAverage = average.toFixed(2);
+
+        // Update both the display and hidden input
+        const gradeId = row.data('grade-id');
+        row.find('#gpa-display-' + gradeId).text(formattedAverage);
+        row.find('#gpa-' + gradeId).val(formattedAverage);
+
+        return formattedAverage;
+    }
+
+    // Update grade fields to calculate GPA when they change
+    $('.grade-input').on('input', function() {
+        const row = $(this).closest('tr');
+        calculateGPA(row);
+    });
+
+    // Calculate all GPAs on page load
+    $('tr[data-grade-id]').each(function() {
+        calculateGPA($(this));
+    });
+
     $('.save-grade').click(function() {
         const row = $(this).closest('tr');
         const gradeId = row.data('grade-id');
         const button = $(this);
-        
-        // 验证所有输入
+        const originalButtonHtml = button.html();
+
         let isValid = true;
         const data = {};
-        
+
         row.find('input[type="number"]').each(function() {
             const input = $(this);
             const name = input.attr('name');
             const value = input.val();
             const min = parseFloat(input.attr('min'));
             const max = parseFloat(input.attr('max'));
-            
+
             if (!validateGrade(value, min, max)) {
                 isValid = false;
                 input.addClass('is-invalid');
@@ -158,15 +374,18 @@ $(document).ready(function() {
             input.removeClass('is-invalid');
             data[name] = value;
         });
-        
+
         if (!isValid) return;
-        
-        // 禁用按钮，显示加载状态
-        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> 保存中');
-        
-        // 添加CSRF token
+
+
+        button.prop('disabled', true).html('<span class="td_btn_in td_white_color td_accent_bg"><i class="fas fa-spinner fa-spin"></i><span>保存中</span></span>');
+
+
         data['csrfmiddlewaretoken'] = $('[name=csrfmiddlewaretoken]').val();
-        
+
+        // Make sure GPA is updated before save
+        calculateGPA(row);
+
         $.ajax({
             url: `/accounts/teacher/grade/update/${gradeId}/`,
             method: 'POST',
@@ -183,16 +402,373 @@ $(document).ready(function() {
                 showSaveStatus(row, false, message);
             },
             complete: function() {
-                // 恢复按钮状态
-                button.prop('disabled', false).html('<i class="fas fa-save"></i> 保存');
+
+                button.prop('disabled', false).html(originalButtonHtml);
             }
         });
     });
 
-    // 输入时移除错误状态
+
     $('.grade-input').on('input', function() {
         $(this).removeClass('is-invalid');
     });
+
+
+    function collectGradeData() {
+        const data = {
+            finalExam: [],
+            assignments: [],
+            regularQuiz: [],
+            attendance: [],
+            gpa: [],
+            studentNames: []
+        };
+
+        $('tr[data-grade-id]').each(function() {
+            const row = $(this);
+            const studentName = row.find('td:eq(1)').text();
+
+            data.finalExam.push(parseFloat(row.find('input[name="final_exam"]').val()) || 0);
+            data.assignments.push(parseFloat(row.find('input[name="assignments"]').val()) || 0);
+            data.regularQuiz.push(parseFloat(row.find('input[name="regular_quiz"]').val()) || 0);
+            data.attendance.push(parseFloat(row.find('input[name="attendance"]').val()) || 0);
+            data.gpa.push(parseFloat(row.find('input[name="gpa"]').val()) || 0);
+            data.studentNames.push(studentName);
+        });
+
+        return data;
+    }
+
+
+    let gradeChart = null;
+    let summaryChart = null;
+    const gradeData = collectGradeData();
+
+
+    function createDistributionChart() {
+        if (gradeChart) gradeChart.destroy();
+
+        const ctx = document.getElementById('gradeChart').getContext('2d');
+        gradeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['90-100', '80-89', '70-79', '60-69', '0-59'],
+                datasets: [{
+                    label: '学生人数',
+                    data: calculateGradeDistribution(gradeData.gpa),
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Grade Distribution Statistics'
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+
+
+        if (summaryChart) summaryChart.destroy();
+
+        const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+        summaryChart = new Chart(summaryCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Excellent (90-100)', 'Good(80-89)', 'Average(70-79)', 'Pass (60-69)', 'Fail (0-59)'],
+                datasets: [{
+                    data: calculateGradeDistribution(gradeData.gpa),
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Proportion of Grade Levels'
+                    }
+                }
+            }
+        });
+    }
+
+
+    function createComparisonChart() {
+        if (gradeChart) gradeChart.destroy();
+
+        const ctx = document.getElementById('gradeChart').getContext('2d');
+        gradeChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Final exam', 'Homework score', 'Regular quiz', 'Attendance'],
+                datasets: [{
+                    label: 'major average grades',
+                    data: [
+                        calculateAverage(gradeData.finalExam),
+                        calculateAverage(gradeData.assignments),
+                        calculateAverage(gradeData.regularQuiz),
+                        calculateAverage(gradeData.attendance)
+                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Comparison of grades'
+                    }
+                },
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        }
+                    }
+                }
+            }
+        });
+
+
+        if (summaryChart) summaryChart.destroy();
+
+        const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+        summaryChart = new Chart(summaryCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Final exam','Homework score','Regular quiz','Attendance'],
+                datasets: [{
+                    label: 'Class average score',
+                    data: [
+                        calculateAverage(gradeData.finalExam),
+                        calculateAverage(gradeData.assignments),
+                        calculateAverage(gradeData.regularQuiz),
+                        calculateAverage(gradeData.attendance)
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Average score statistics'
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    function createTrendChart() {
+        if (gradeChart) gradeChart.destroy();
+
+        const displayLimit = Math.min(10, gradeData.studentNames.length);
+        const limitedNames = gradeData.studentNames.slice(0, displayLimit);
+        const limitedGpa = gradeData.gpa.slice(0, displayLimit);
+
+        const ctx = document.getElementById('gradeChart').getContext('2d');
+        gradeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: limitedNames,
+                datasets: [{
+                    label: 'Overall grade',
+                    data: limitedGpa,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Student grade comparison'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+
+        if (summaryChart) summaryChart.destroy();
+
+        const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+        summaryChart = new Chart(summaryCtx, {
+            type: 'line',
+            data: {
+                labels: ['Final exam', 'Homework score', 'Regular quiz', 'Attendance'],
+                datasets: [{
+                    label: ' major average',
+                    data: [
+                        calculateAverage(gradeData.finalExam),
+                        calculateAverage(gradeData.assignments),
+                        calculateAverage(gradeData.regularQuiz),
+                        calculateAverage(gradeData.attendance)
+                    ],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: ' major average performance'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+
+    function calculateGradeDistribution(grades) {
+        const distribution = [0, 0, 0, 0, 0]; // [90-100, 80-89, 70-79, 60-69, 0-59]
+
+        grades.forEach(grade => {
+            if (grade >= 90) distribution[0]++;
+            else if (grade >= 80) distribution[1]++;
+            else if (grade >= 70) distribution[2]++;
+            else if (grade >= 60) distribution[3]++;
+            else distribution[4]++;
+        });
+
+        return distribution;
+    }
+
+    function calculateAverage(scores) {
+        if (scores.length === 0) return 0;
+        const sum = scores.reduce((a, b) => a + b, 0);
+        return (sum / scores.length).toFixed(2);
+    }
+
+
+    createDistributionChart();
+
+    // 切换图表类型
+    $('.chart-tab').click(function() {
+        $('.chart-tab').removeClass('active');
+        $(this).addClass('active');
+
+        const chartType = $(this).data('chart');
+
+        if (chartType === 'distribution') {
+            createDistributionChart();
+        } else if (chartType === 'comparison') {
+            createComparisonChart();
+        } else if (chartType === 'trend') {
+            createTrendChart();
+        }
+    });
+
+
+    $('.grade-input').on('change', function() {
+
+        const gradeData = collectGradeData();
+
+
+        const activeTab = $('.chart-tab.active').data('chart');
+
+        if (activeTab === 'distribution') {
+            createDistributionChart();
+        } else if (activeTab === 'comparison') {
+            createComparisonChart();
+        } else if (activeTab === 'trend') {
+            createTrendChart();
+        }
+    });
 });
 </script>
-{% endblock %} 
+{% endblock %}

@@ -1,23 +1,26 @@
 {% extends 'teacher/base.html' %}
+{% load static %}
 
-{% block title %}教师仪表盘{% endblock %}
+{% block title %}Teacher Dashboard{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-12 mb-4">
-        <h2>欢迎, {{ teacher.full_name }}</h2>
+        <h2 class="td_fs_36 td_medium">Welcome, {{ teacher.full_name }}</h2>
         <p class="text-muted">{{ teacher.title }} - {{ teacher.department }}</p>
     </div>
 </div>
 
-<div class="row">
+<div class="row td_gap_y_30">
     <!-- Courses Section -->
     <div class="col-md-8">
-        <div class="card">
+        <div class="card td_radius_10 td_gray_bg_5">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">我的课程</h4>
-                <a href="{% url 'manage_courses' %}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> 添加课程
+                <h4 class="mb-0 td_fs_24 td_medium">My Courses</h4>
+                <a href="{% url 'manage_courses' %}" class="td_btn td_style_1 td_radius_10 td_medium">
+                    <span class="td_btn_in td_white_color td_accent_bg">
+                        <i class="fas fa-plus me-2"></i><span>Manage Courses</span>
+                    </span>
                 </a>
             </div>
             <div class="card-body">
@@ -26,10 +29,10 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>课程编号</th>
-                                    <th>课程名称</th>
-                                    <th>学分</th>
-                                    <th>操作</th>
+                                    <th>Course Number</th>
+                                    <th>Course Name</th>
+                                    <th>Credits</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -39,8 +42,10 @@
                                     <td>{{ course.course_name }}</td>
                                     <td>{{ course.credits }}</td>
                                     <td>
-                                        <a href="{% url 'manage_grades' course.course_id %}" class="btn btn-info btn-sm">
-                                            <i class="fas fa-graduation-cap"></i> 成绩管理
+                                        <a href="{% url 'manage_grades' course.course_id %}" class="td_btn td_style_1 td_radius_10 td_medium btn-sm">
+<!--                                            <span class="td_btn_in td_white_color td_accent_bg">-->
+<!--&lt;!&ndash;                                                <i class="fas fa-graduation-cap me-1"></i><span></span>&ndash;&gt;-->
+<!--                                            </span>-->
                                         </a>
                                     </td>
                                 </tr>
@@ -49,7 +54,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-center text-muted">暂无分配的课程</p>
+                    <p class="text-center text-muted td_fs_18">No assigned courses</p>
                 {% endif %}
             </div>
         </div>
@@ -57,31 +62,33 @@
 
     <!-- Announcements Section -->
     <div class="col-md-4">
-        <div class="card">
+        <div class="card td_radius_10 td_gray_bg_5">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">最新公告</h4>
-                <a href="{% url 'teacher_announcements' %}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-external-link-alt"></i> 查看全部
+                <h4 class="mb-0 td_fs_24 td_medium">Latest Announcements</h4>
+                <a href="{% url 'teacher_announcements' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium btn-sm">
+                    <span class="td_btn_in td_accent_color">
+                        <i class="fas fa-external-link-alt me-1"></i><span>View All</span>
+                    </span>
                 </a>
             </div>
             <div class="card-body">
                 {% if announcements %}
                     <div class="list-group list-group-flush">
                         {% for announcement in announcements %}
-                        <div class="list-group-item">
-                            <h6 class="mb-1">{{ announcement.title }}</h6>
-                            <p class="mb-1 text-truncate">{{ announcement.content }}</p>
+                        <div class="list-group-item bg-transparent border-0 mb-3">
+                            <h6 class="mb-1 td_fs_18 td_medium">{{ announcement.title }}</h6>
+                            <p class="mb-1 text-truncate td_heading_color td_opacity_7">{{ announcement.content }}</p>
                             <small class="text-muted">
-                                {{ announcement.publish_date|date:"Y年m月d日" }}
+                                {{ announcement.publish_date|date:"Y-m-d" }}
                             </small>
                         </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="text-center text-muted">暂无公告</p>
+                    <p class="text-center text-muted td_fs_18">No announcements</p>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

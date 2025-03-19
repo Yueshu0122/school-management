@@ -5,7 +5,7 @@
  Source Server Type    : MySQL
  Source Server Version : 90200 (9.2.0)
  Source Host           : localhost:3306
- Source Schema         : grade_manqqagement
+ Source Schema         : grade_management
 
  Target Server Type    : MySQL
  Target Server Version : 90200 (9.2.0)
@@ -247,7 +247,7 @@ CREATE TABLE `course` (
   `course_id` int NOT NULL,
   `course_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `credits` int NOT NULL,
-  `college_id` int NOT NULL,
+  `major_id` int NOT NULL,
   `teacher_id` int NOT NULL,
   PRIMARY KEY (`course_id`),
   KEY `course_teacher_id_b694c4f5_fk_Teacher_Teacher_ID` (`teacher_id`),

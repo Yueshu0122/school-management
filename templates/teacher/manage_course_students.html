@@ -1,37 +1,54 @@
 {% extends 'teacher/base.html' %}
+{% load static %}
 
-{% block title %}学生管理 - {{ course.course_name }}{% endblock %}
+{% block title %}Student Management - {{ course.course_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/teacher/manage_course_students.css' %}">
+{% endblock %}
 
 {% block content %}
 {% csrf_token %}
+<meta name="course-id" content="{{ course.course_id }}">
+<!-- Extra top spacing to avoid base.html elements overlap -->
+<div style="height: 35px;"></div>
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>{{ course.course_name }} - 学生管理</h2>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                <i class="fas fa-user-plus"></i> 添加学生
-            </button>
+            <h2 class="td_fs_36 td_medium">Manage Students - {{ course.course_name }}</h2>
+            <div class="header-actions">
+                <a href="{% url 'teacher_dashboard' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium dashboard-link me-2">
+                    <span class="td_btn_in td_accent_color">
+                        <i class="fas fa-arrow-left me-2"></i><span>Back to Dashboard</span>
+                    </span>
+                </a>
+                <button type="button" class="td_btn td_style_1 td_radius_10 td_medium" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                    <span class="td_btn_in td_white_color td_accent_bg">
+                        <i class="fas fa-user-plus me-2"></i><span>Add Student</span>
+                    </span>
+                </button>
+            </div>
         </div>
 
         <!-- Enrolled Students -->
-        <div class="card mb-4">
+        <div class="card td_radius_10 td_gray_bg_5 mb-4">
             <div class="card-header">
-                <h4 class="mb-0">已选课学生</h4>
+                <h4 class="mb-0 td_fs_24 td_medium">Enrolled Students</h4>
             </div>
             <div class="card-body">
                 {% if enrolled_students %}
-                    <div class="table-responsive">
+                    <div class="table-container">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>学号</th>
-                                    <th>姓名</th>
-                                    <th>期末考试</th>
-                                    <th>作业成绩</th>
-                                    <th>平时测验</th>
-                                    <th>出勤情况</th>
-                                    <th>绩点</th>
-                                    <th>操作</th>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Final Exam</th>
+                                    <th>Assignments</th>
+                                    <th>Quizzes</th>
+                                    <th>Attendance</th>
+                                    <th>GPA</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,46 +57,51 @@
                                     <td>{{ student.student_id }}</td>
                                     <td>{{ student.full_name }}</td>
                                     <td>
-                                        <label class="visually-hidden" for="final_exam_{{ student.student_id }}">期末考试成绩</label>
-                                        <input type="number" class="form-control form-control-sm grade-input" 
+                                        <label class="visually-hidden" for="final_exam_{{ student.student_id }}">Final Exam Grade</label>
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input" 
                                                id="final_exam_{{ student.student_id }}"
                                                name="final_exam" min="0" max="100" step="0.01"
-                                               title="期末考试成绩">
+                                               title="Final Exam Grade">
                                     </td>
                                     <td>
-                                        <label class="visually-hidden" for="assignments_{{ student.student_id }}">作业成绩</label>
-                                        <input type="number" class="form-control form-control-sm grade-input"
+                                        <label class="visually-hidden" for="assignments_{{ student.student_id }}">Assignments Grade</label>
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                id="assignments_{{ student.student_id }}"
                                                name="assignments" min="0" max="100" step="0.01"
-                                               title="作业成绩">
+                                               title="Assignments Grade">
                                     </td>
                                     <td>
-                                        <label class="visually-hidden" for="regular_quiz_{{ student.student_id }}">平时测验成绩</label>
-                                        <input type="number" class="form-control form-control-sm grade-input"
+                                        <label class="visually-hidden" for="regular_quiz_{{ student.student_id }}">Quiz Grade</label>
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                id="regular_quiz_{{ student.student_id }}"
                                                name="regular_quiz" min="0" max="100" step="0.01"
-                                               title="平时测验成绩">
+                                               title="Quiz Grade">
                                     </td>
                                     <td>
-                                        <label class="visually-hidden" for="attendance_{{ student.student_id }}">出勤成绩</label>
-                                        <input type="number" class="form-control form-control-sm grade-input"
+                                        <label class="visually-hidden" for="attendance_{{ student.student_id }}">Attendance Grade</label>
+                                        <input type="number" class="td_form_field td_medium td_white_bg grade-input"
                                                id="attendance_{{ student.student_id }}"
                                                name="attendance" min="0" max="100" step="0.01"
-                                               title="出勤成绩">
+                                               title="Attendance Grade">
                                     </td>
                                     <td>
-                                        <label class="visually-hidden" for="gpa_{{ student.student_id }}">绩点</label>
-                                        <input type="number" class="form-control form-control-sm grade-input"
-                                               id="gpa_{{ student.student_id }}"
-                                               name="gpa" min="0" max="4" step="0.01"
-                                               title="绩点">
+                                        <span class="td_form_field td_medium td_white_bg grade-display" 
+                                               id="gpa-display-{{ student.student_id }}"
+                                               style="display: inline-block; width: 85px; text-align: center; padding: 6px 4px; background-color: #f8f9fa;">
+                                            0.00
+                                        </span>
+                                        <input type="hidden" name="gpa" id="gpa-{{ student.student_id }}" value="0">
                                     </td>
                                     <td>
-                                        <button class="btn btn-primary btn-sm save-grades" title="保存成绩">
-                                            <i class="fas fa-save"></i> 保存
+                                        <button class="td_btn td_style_1 td_radius_10 td_medium btn-sm save-grades me-1">
+                                            <span class="td_btn_in td_white_color td_accent_bg">
+                                                <i class="fas fa-save me-1"></i><span>Save</span>
+                                            </span>
                                         </button>
-                                        <button class="btn btn-danger btn-sm remove-student" title="移除学生">
-                                            <i class="fas fa-user-minus"></i> 移除
+                                        <button class="td_btn td_style_1 td_type_2 td_radius_10 td_medium btn-sm remove-student">
+                                            <span class="td_btn_in td_white_color td_error_bg">
+                                                <i class="fas fa-user-minus me-1"></i><span>Remove</span>
+                                            </span>
                                         </button>
                                     </td>
                                 </tr>
@@ -88,7 +110,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-center text-muted">暂无学生选修此课程</p>
+                    <p class="text-center text-muted td_fs_18">No students enrolled in this course</p>
                 {% endif %}
             </div>
         </div>
@@ -98,16 +120,16 @@
 <!-- Add Student Modal -->
 <div class="modal fade" id="addStudentModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content td_radius_10">
             <div class="modal-header">
-                <h5 class="modal-title">添加学生到课程</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                <h5 class="modal-title td_fs_24 td_medium">Add Student to Course</h5>
+                <button type="button" class="btn-close" onclick="closeCustomModal('addStudentModal')" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="student-select" class="form-label">选择学生</label>
-                    <select class="form-select" id="student-select">
-                        <option value="">请选择学生...</option>
+                    <label for="student-select" class="form-label td_medium">Select Student</label>
+                    <select class="td_form_field td_medium td_white_bg" id="student-select">
+                        <option value="">Please select a student...</option>
                         {% for student in students %}
                             {% if student not in enrolled_students %}
                                 <option value="{{ student.student_id }}">
@@ -119,8 +141,16 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" id="add-student-btn">添加学生</button>
+                <button type="button" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium" onclick="closeCustomModal('addStudentModal')">
+                    <span class="td_btn_in td_accent_color">
+                        <span>Cancel</span>
+                    </span>
+                </button>
+                <button type="button" class="td_btn td_style_1 td_radius_10 td_medium" id="add-student-btn">
+                    <span class="td_btn_in td_white_color td_accent_bg">
+                        <span>Add Student</span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -128,120 +158,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-$(document).ready(function() {
-    // 加载现有成绩
-    function loadStudentGrades(studentId) {
-        $.get(`/grades/course/{{ course.course_id }}/student/${studentId}/grades/`)
-            .done(function(data) {
-                const row = $(`tr[data-student-id="${studentId}"]`);
-                row.find('input[name="final_exam"]').val(data.final_exam);
-                row.find('input[name="assignments"]').val(data.assignments);
-                row.find('input[name="regular_quiz"]').val(data.regular_quiz);
-                row.find('input[name="attendance"]').val(data.attendance);
-                row.find('input[name="gpa"]').val(data.gpa);
-            })
-            .fail(function(xhr) {
-                console.error('加载成绩失败:', xhr.responseText);
-            });
-    }
-
-    // 加载所有已选课学生的成绩
-    $('.table tbody tr').each(function() {
-        const studentId = $(this).data('student-id');
-        loadStudentGrades(studentId);
-    });
-
-    // 添加学生到课程
-    $('#add-student-btn').click(function() {
-        const studentId = $('#student-select').val();
-        if (!studentId) {
-            alert('请选择一个学生');
-            return;
-        }
-
-        $.ajax({
-            url: `/grades/course/{{ course.course_id }}/student/${studentId}/add/`,
-            method: 'POST',
-            data: {
-                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    location.reload();
-                } else {
-                    alert('添加学生失败: ' + response.message);
-                }
-            },
-            error: function(xhr) {
-                alert('添加学生失败，请重试');
-            }
-        });
-    });
-
-    // 从课程中移除学生
-    $('.remove-student').click(function() {
-        if (!confirm('确定要将此学生从课程中移除吗？')) {
-            return;
-        }
-
-        const row = $(this).closest('tr');
-        const studentId = row.data('student-id');
-
-        $.ajax({
-            url: `/grades/course/{{ course.course_id }}/student/${studentId}/remove/`,
-            method: 'POST',
-            data: {
-                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    row.remove();
-                } else {
-                    alert('移除学生失败: ' + response.message);
-                }
-            },
-            error: function(xhr) {
-                alert('移除学生失败，请重试');
-            }
-        });
-    });
-
-    // 保存成绩
-    $('.save-grades').click(function() {
-        const row = $(this).closest('tr');
-        const studentId = row.data('student-id');
-        const gradeData = {
-            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val(),
-            'final_exam': row.find('input[name="final_exam"]').val(),
-            'assignments': row.find('input[name="assignments"]').val(),
-            'regular_quiz': row.find('input[name="regular_quiz"]').val(),
-            'attendance': row.find('input[name="attendance"]').val(),
-            'gpa': row.find('input[name="gpa"]').val()
-        };
-
-        // 获取grade_id
-        $.get(`/grades/course/{{ course.course_id }}/student/${studentId}/grades/`)
-            .done(function(data) {
-                if (data.grade_id) {
-                    $.ajax({
-                        url: `/grades/grade/${data.grade_id}/update/`,
-                        method: 'POST',
-                        data: gradeData,
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                alert('成绩保存成功');
-                            } else {
-                                alert('成绩保存失败: ' + response.message);
-                            }
-                        },
-                        error: function(xhr) {
-                            alert('成绩保存失败，请重试');
-                        }
-                    });
-                }
-            });
-    });
-});
-</script>
+<script src="{% static 'js/teacher/grade-calculation.js' %}"></script>
+<script src="{% static 'js/teacher/manage_course_students.js' %}"></script>
 {% endblock %} 
