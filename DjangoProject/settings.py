@@ -118,12 +118,13 @@ STATIC_URL = '/static/'  # 静态文件的URL前缀
 
 # 静态文件目录列表，用于开发环境
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # 项目根目录下的static文件夹
-    os.path.join(BASE_DIR, 'templates/assets'),  # 如果您的资源在templates/assets目录下
+    BASE_DIR / "static",  # 项目根目录下的static文件夹
+    BASE_DIR / "templates" / "assets",  # 如果您的资源在templates/assets目录下
 ]
 
 # 静态文件收集目录，用于生产环境
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # 媒体文件配置（如果需要）
 MEDIA_URL = '/media/'
