@@ -7,7 +7,7 @@ class AnnouncementSerializer(serializers.ModelSerializer):
         model = Announcement
         fields = ['announcement_id', 'title', 'content', 'author', 'publish_date']
 
-    # 校验公告标题：不能为空且长度不能超过200个字符（与数据库字段定义保持一致）
+    ## Validate the announcement title: It should not be empty and its length should not exceed 200 characters (consistent with the database field definition).
     def validate_title(self, value):
         if not value.strip():
             raise serializers.ValidationError("Title cannot be empty.")
@@ -15,18 +15,18 @@ class AnnouncementSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Title must not exceed 200 characters.")
         return value
 
-    # 校验公告内容：不能为空
+    # # Validate the announcement content: It should not be empty.
     def validate_content(self, value):
         if not value.strip():
             raise serializers.ValidationError("Content cannot be empty.")
         return value
 
-    # 校验发布时间：不能晚于当前时间（不允许将来时间）
+    # Validate the publication time: It should not be later than the current time (future dates are not allowed).
     def validate_publish_date(self, value):
         if value > timezone.now():
             raise serializers.ValidationError("Publish date cannot be in the future.")
         return value
 
     def validate(self, data):
-        # 如果需要做跨字段验证，可以在这里添加
+        # If cross-field validation is needed, it can be added here.
         return data

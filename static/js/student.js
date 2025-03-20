@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!tableBody) return;
         
         if (grades.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="7" class="text-center">暂无成绩数据</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No grade data available.</td></tr>';
             return;
         }
         

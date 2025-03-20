@@ -1,6 +1,6 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}编辑公告{% endblock %}
+{% block title %}Edit Announcement{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -18,15 +18,15 @@
 {% endblock %}
 
 {% block content %}
-<!-- 额外添加顶部间距，避免base.html中的元素遮挡 -->
+<!-- Add extra top margin to avoid elements in base.html from overlapping -->
 <div style="height: 35px;"></div>
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="td_fs_36 td_medium">编辑公告</h2>
+            <h2 class="td_fs_36 td_medium">Edit Announcement</h2>
             <a href="{% url 'admin_announcements' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium dashboard-link">
                 <span class="td_btn_in td_accent_color">
-                    <i class="fas fa-arrow-left me-2"></i><span>返回公告列表</span>
+                    <i class="fas fa-arrow-left me-2"></i><span>Return the list of announcements</span>
                 </span>
             </a>
         </div>
@@ -39,18 +39,18 @@
                 <form method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="title" class="form-label td_medium">标题</label>
+                        <label for="title" class="form-label td_medium">Title</label>
                         <input type="text" class="td_form_field td_medium td_white_bg" id="title" name="title" 
                                value="{{ announcement.title }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="content" class="form-label td_medium">内容</label>
+                        <label for="content" class="form-label td_medium">Content</label>
                         <textarea class="td_form_field td_medium td_white_bg" id="content" name="content" 
                                   rows="5" required>{{ announcement.content }}</textarea>
                     </div>
                     <button type="submit" class="td_btn td_style_1 td_radius_10 td_medium">
                         <span class="td_btn_in td_white_color td_accent_bg">
-                            <i class="fas fa-save me-2"></i><span>更新公告</span>
+                            <i class="fas fa-save me-2"></i><span>Update Announcement</span>
                         </span>
                     </button>
                 </form>

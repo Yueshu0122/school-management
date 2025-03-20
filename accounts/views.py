@@ -22,10 +22,10 @@ User = get_user_model()
 
 # HTML Views for traditional Django authentication
 def login_view(request):
-    # 添加调试信息
-    print("login_view 被调用")
+
+    print("login_view Called")
     
-    # 如果用户已经登录，根据角色重定向到相应页面
+    # If the user is already logged in, redirect them to the corresponding page based on their role.
     if request.user.is_authenticated:
         if request.user.role == 'teacher':
             return redirect('teacher_dashboard')
@@ -36,21 +36,21 @@ def login_view(request):
         return redirect('index')
         
     if request.method == 'POST':
-        email = request.POST.get('email')  # 改为使用email字段
+        email = request.POST.get('email')
         password = request.POST.get('password')
         
-        # 尝试通过邮箱查找用户
+        # Attempt to find the user by email
         try:
             user = CustomUser.objects.get(email=email)
             username = user.username
-            # 使用authenticate验证密码
+            # Using `authenticate` to verify the password
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome，{user.username}！')
                 
-                # 根据用户角色重定向到不同页面
+                # # Redirect users to different pages based on their roles
                 if user.role == 'teacher':
                     return redirect('teacher_dashboard')
                 elif user.role == 'student':
@@ -60,9 +60,9 @@ def login_view(request):
                 else:
                     return redirect('index')
             else:
-                messages.error(request, '邮箱或密码不正确。')
+                messages.error(request, 'The email address or password is incorrect.。')
         except CustomUser.DoesNotExist:
-            messages.error(request, '该邮箱未注册。')
+            messages.error(request, 'The email address is not registered.')
             
     return render(request, 'login.html')
 
@@ -71,56 +71,56 @@ def register_view(request):
         return redirect('index')
         
     if request.method == 'POST':
-        # 获取基本信息
+
         full_name = request.POST.get('full_name')
         phone_no = request.POST.get('phone_no')
         email = request.POST.get('email')
-        # 将邮箱作为用户名
+
         username = email
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
         role = request.POST.get('role')
         
-        # 检查密码是否匹配
+
         if password != confirm_password:
-            messages.error(request, '密码不匹配')
+            messages.error(request, 'The passwords do not match.')
             return redirect('register')
             
-        # 检查邮箱是否已存在
+
         if User.objects.filter(email=email).exists():
-            messages.error(request, '该邮箱已注册')
+            messages.error(request, 'The email address is already registered.')
             return redirect('register')
         
         try:
-            # 生成新的用户ID
+
             latest_user = User.objects.order_by('-user_id').first()
             new_user_id = 1 if latest_user is None else latest_user.user_id + 1
             
             if role == 'student':
-                # 获取学生额外信息
+
                 degree_programme = request.POST.get('degree_programme')
                 year_of_study = request.POST.get('year_of_study')
                 
-                # 生成新学生ID
+
                 latest_student = Student.objects.order_by('-student_id').first()
                 new_student_id = 1 if latest_student is None else latest_student.student_id + 1
                 
-                # 创建学生记录
+
                 student = Student.objects.create(
                     student_id=new_student_id,
-                    full_name=full_name,  # 保存全名
+                    full_name=full_name,
                     phone_no=phone_no,
                     email=email,
                     degree_programme=degree_programme,
                     year_of_study=year_of_study,
-                    gpa=0.0,  # 默认值
-                    enrollment_status='Active'  # 默认值
+                    gpa=0.0,
+                    enrollment_status='Active'
                 )
                 
-                # 创建用户记录与学生关联，使用邮箱作为用户名
+                # Create a user record associated with a student, using the email as the username.
                 user = User.objects.create_user(
                     user_id=new_user_id,
-                    username=username,  # 使用邮箱作为用户名
+                    username=username,
                     email=email,
                     password=password,
                     role='student',
@@ -128,19 +128,19 @@ def register_view(request):
                 )
                 
             elif role == 'teacher':
-                # 获取教师额外信息
+
                 title = request.POST.get('title')
                 department = request.POST.get('department')
                 office_location = request.POST.get('office_location')
                 
-                # 生成新教师ID
+
                 latest_teacher = Teacher.objects.order_by('-teacher_id').first()
                 new_teacher_id = 1 if latest_teacher is None else latest_teacher.teacher_id + 1
                 
-                # 创建教师记录
+
                 teacher = Teacher.objects.create(
                     teacher_id=new_teacher_id,
-                    full_name=full_name,  # 保存全名
+                    full_name=full_name,
                     email=email,
                     phone_no=phone_no,
                     title=title,
@@ -148,21 +148,21 @@ def register_view(request):
                     office_location=office_location
                 )
                 
-                # 创建用户记录与教师关联，使用邮箱作为用户名
+
                 user = User.objects.create_user(
                     user_id=new_user_id,
-                    username=username,  # 使用邮箱作为用户名
+                    username=username,
                     email=email,
                     password=password,
                     role='teacher',
                     linked_id=teacher.teacher_id
                 )
             
-            messages.success(request, '注册成功，请登录')
+            messages.success(request, 'Registration successful, please log in.')
             return redirect('login')
             
         except Exception as e:
-            messages.error(request, f'注册失败: {str(e)}')
+            messages.error(request, f'Registration failed.: {str(e)}')
             
     return render(request, 'register.html')
 
@@ -182,13 +182,12 @@ def index_view(request):
 # REST API Views
 class RegisterView(APIView):
     """
-    用户注册视图。根据传入数据创建用户，并根据角色验证 linked_id 是否存在于 Teacher 或 Student 表中，
-    同时将用户添加到相应的组中，并捕获数据库异常返回友好提示。
+   User registration view. Create a user based on the provided data and validate whether the `linked_id` exists in the `Teacher` or `Student` table according to the role. Also, add the user to the corresponding group and catch database exceptions to return friendly prompts.。
     """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # 获取 ER 图中的必填字段
+
         user_id = request.data.get('user_id')
         username = request.data.get('username')
         password = request.data.get('password')
@@ -196,7 +195,7 @@ class RegisterView(APIView):
         role = request.data.get('role', 'student')
         linked_id = request.data.get('linked_id', None)
 
-        # 基本字段验证
+
         if not user_id or not username or not password or not email:
             return Response({"detail": "Missing required fields."},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -208,7 +207,7 @@ class RegisterView(APIView):
             return Response({"detail": "Username already exists."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # 根据角色验证 linked_id 是否存在于 Teacher 或 Student 表中
+
         if role == 'teacher':
             if linked_id is None:
                 return Response({"detail": "Linked ID is required for teacher role."},
@@ -223,9 +222,7 @@ class RegisterView(APIView):
             if not Student.objects.filter(student_id=linked_id).exists():
                 return Response({"detail": "Student with provided Linked ID does not exist."},
                                 status=status.HTTP_400_BAD_REQUEST)
-        # 对于 admin 角色，linked_id 可选或不需要验证
 
-        # 尝试创建用户，并捕获数据库异常
         try:
             user = User.objects.create(
                 user_id=user_id,
@@ -241,7 +238,6 @@ class RegisterView(APIView):
             return Response({"detail": f"Error creating user: {str(e)}"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # 根据角色将用户添加到对应组中，并捕获异常
         try:
             if role == 'teacher':
                 group, _ = Group.objects.get_or_create(name='Teacher')
@@ -261,7 +257,7 @@ class RegisterView(APIView):
 
 class AdminOnlyView(APIView):
     """
-    仅限管理员访问的视图。只有 role 为 'admin' 的用户才能访问该接口。
+
     """
     permission_classes = [permissions.IsAuthenticated]
 
@@ -395,7 +391,7 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    # 使用 select_related 获取相关的作者信息，并限制最近5条公告
+
     announcements = Announcement.objects.select_related('author').order_by('-publish_date')[:5]
     context = {
         'announcements': announcements,
@@ -405,7 +401,7 @@ def admin_dashboard(request):
 @login_required
 @user_passes_test(is_admin)
 def admin_announcements(request):
-    # 使用 select_related 获取相关的作者信息
+
     announcements = Announcement.objects.select_related('author').order_by('-publish_date')
     return render(request, 'admin/announcements.html', {'announcements': announcements})
 
@@ -471,14 +467,13 @@ def delete_announcement(request, announcement_id):
         messages.error(request, f'Error deleting announcement: {str(e)}')
     return redirect('admin_announcements')
 
-# 学生查看公告详情
 @login_required
 @user_passes_test(is_student)
 def student_announcement_details(request, announcement_id):
     announcement = get_object_or_404(Announcement, announcement_id=announcement_id)
     return render(request, 'student/announcement_details.html', {'announcement': announcement})
 
-# 管理员查看公告详情
+
 @login_required
 @user_passes_test(is_admin)
 def admin_announcement_details(request, announcement_id):

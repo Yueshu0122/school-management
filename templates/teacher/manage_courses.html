@@ -21,18 +21,18 @@
     .table td {
         text-align: center;
         vertical-align: middle;
-        color: var(--td-heading-color); /* 与页面风格一致的字体颜色 */
+        color: var(--td-heading-color);
     }
     .table th {
-        background-color: #2c3e50; /* 深色背景提高对比度 */
-        color: #ffffff; /* 纯白色文字 */
-        font-weight: 600; /* 增加字体粗细 */
+        background-color: #2c3e50;
+        color: #ffffff;
+        font-weight: 600;
         padding: 12px 10px;
-        text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* 添加文字阴影增强可读性 */
-        letter-spacing: 0.5px; /* 增加字母间距 */
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        letter-spacing: 0.5px;
     }
     .table thead th {
-        border-bottom: 2px solid #1abc9c; /* 添加下边框强调 */
+        border-bottom: 2px solid #1abc9c;
     }
     .table thead th:first-child {
         border-top-left-radius: 8px;
@@ -53,18 +53,17 @@
         display: inline-block;
         cursor: pointer;
         position: relative;
-        z-index: 25; /* 降低z-index，确保不会阻挡模态框 */
+        z-index: 25;
         pointer-events: auto !important;
     }
     .dashboard-link .td_btn_in {
         pointer-events: auto !important;
     }
-    /* 保证返回按钮可点击 - 增强版 */
     .header-actions {
         position: relative;
-        z-index: 30; /* 降低z-index，确保不会阻挡模态框 */
+        z-index: 30;
     }
-    /* 确保模态框正常显示 */
+
     .modal-backdrop {
         z-index: 50 !important;
     }
@@ -74,7 +73,7 @@
     .modal-dialog {
         z-index: 70 !important;
     }
-    /* 确保按钮可点击 */
+
     .header-actions button {
         position: relative;
         z-index: 25;
@@ -84,17 +83,17 @@
         pointer-events: auto !important;
     }
 
-    /* 修复前端遮挡问题 */
+
     .td_preloader, .td_scrollup {
         z-index: 1000 !important;
     }
 
-    /* 解决粘性头部可能导致的问题 */
+
     .td_sticky_header {
         z-index: 40 !important;
     }
 
-    /* 确保模态框在所有元素之上 */
+
     .modal-backdrop {
         z-index: 1050 !important;
     }
@@ -105,7 +104,7 @@
         z-index: 1070 !important;
     }
 
-    /* 确保按钮真正可点击 */
+
     .header-actions a,
     .header-actions button {
         position: relative;
@@ -118,7 +117,7 @@
         pointer-events: auto !important;
     }
 
-    /* 强制模态框内容可见 */
+
     #addCourseModal, #addMajorModal {
         display: none;
     }
@@ -126,38 +125,37 @@
         display: block;
     }
 
-    /* 直接样式按钮添加内联事件 */
+
     [data-bs-target="#addCourseModal"],
     [data-bs-target="#addMajorModal"] {
         cursor: pointer !important;
     }
 
-    /* 修复前端遮挡问题 */
+
     .td_preloader, .td_scrollup {
         z-index: 1000 !important;
     }
 
-    /* 解决粘性头部可能导致的问题 */
+
     .td_sticky_header {
         z-index: 40 !important;
     }
 
-    /* 确保页面主体内容不被头部遮挡 */
+
     .main-content {
         position: relative;
-        padding-top: 20px; /* 增加顶部内边距 */
-        margin-top: 10px; /* 增加顶部外边距 */
+        padding-top: 20px;
+        margin-top: 10px;
     }
 
-    /* 增加header-actions区域的可见性和可点击性 */
+
     .header-actions {
         position: relative;
-        z-index: 45; /* 比粘性头部高一点 */
-        margin-top: 10px; /* 增加顶部边距 */
-        padding: 5px; /* 增加内边距使点击区域更大 */
+        z-index: 45;
+        margin-top: 10px;
+        padding: 5px;
     }
 
-    /* 增强按钮样式 */
     .action-button {
         padding: 12px 16px !important;
         font-size: 16px !important;
@@ -172,7 +170,7 @@
 
 {% block content %}
 {% csrf_token %}
-<!-- 额外添加顶部间距，避免base.html中的元素遮挡 -->
+
 <div style="height: 45px;"></div>
 <div class="row">
     <div class="col-12">
@@ -235,7 +233,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-center text-muted td_fs_18">暂无课程</p>
+                    <p class="text-center text-muted td_fs_18">No Courses Available</p>
                 {% endif %}
             </div>
         </div>
@@ -247,8 +245,8 @@
     <div class="modal-dialog">
         <div class="modal-content td_radius_10">
             <div class="modal-header">
-                <h5 class="modal-title td_fs_24 td_medium">添加新课程</h5>
-                <button type="button" class="btn-close" onclick="closeCustomModal('addCourseModal')" aria-label="关闭"></button>
+                <h5 class="modal-title td_fs_24 td_medium">Add New Course</h5>
+                <button type="button" class="btn-close" onclick="closeCustomModal('addCourseModal')" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="addCourseForm">
@@ -256,7 +254,7 @@
                     <div class="mb-3">
                         <label for="course_id" class="form-label td_medium">Course Number</label>
                         <input type="number" class="td_form_field td_medium td_white_bg" id="course_id" name="course_id" required>
-                        <small class="form-text text-muted">请输入唯一的Course Number，该编号在系统中不存在</small>
+                        <small class="form-text text-muted">Please enter a unique Course Number that does not exist in the system.</small>
                     </div>
                     <div class="mb-3">
                         <label for="course_name" class="form-label td_medium">Course Name</label>
@@ -298,17 +296,17 @@
 
 {% block extra_js %}
 <script>
-// 定义关闭模态框的函数
+
 function closeCustomModal(modalId) {
-    // 移除模态框的显示类
+
     document.getElementById(modalId).classList.remove('show');
     document.getElementById(modalId).style.display = 'none';
 
-    // 移除body上的modal-open类和内联样式
+
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
 
-    // 移除背景遮罩
+
     const backdrops = document.getElementsByClassName('modal-backdrop');
     if (backdrops.length > 0) {
         Array.from(backdrops).forEach(backdrop => {
@@ -337,41 +335,41 @@ $(document).ready(function() {
         });
     }
 
-    // 原有的保存事件处理代码
+
     $('#saveCourse').click(function() {
         const course_id = $('#course_id').val();
         const course_name = $('#course_name').val();
         const credits = $('#credits').val();
         const major_id = $('#major_id').val();
 
-        // 前端验证
+
         if (!course_id || !course_name || !credits || !major_id) {
             alert('Please fill in all the required fields.');
             return;
         }
 
-        // 首先检查课程ID是否已存在
+
         $.ajax({
             url: '/accounts/check_course_id_exists/',
             method: 'GET',
             data: { course_id: course_id },
             success: function(response) {
                 if (response.exists) {
-                    // 如果ID已存在，显示错误消息
-                    alert('错误: 课程ID ' + course_id + ' 已存在，请使用其他ID');
+
+                    alert('Error: Course ID' + course_id + 'already exists, please use another ID');
                 } else {
-                    // ID不存在，可以创建课程
+
                     submitCourseForm(course_id, course_name, credits, major_id);
                 }
             },
             error: function() {
-                // 如果检查失败，尝试直接提交并处理可能的错误
+
                 submitCourseForm(course_id, course_name, credits, major_id);
             }
         });
     });
 
-    // 提取提交表单的逻辑到单独的函数
+
     function submitCourseForm(course_id, course_name, credits, major_id) {
         const formData = {
             course_id: course_id,
@@ -389,28 +387,28 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.status === 'success') {
-                    // 成功创建课程
+
                     closeCustomModal('addCourseModal');
-                    alert('课程创建成功');
+                    alert('Course created successfully');
                     location.reload();
                 } else {
-                    // 处理具体错误
+
                     if (response.message && response.message.includes('Duplicate entry')) {
-                        alert('错误: 课程ID ' + course_id + ' 已经存在，请使用其他ID');
+                        alert('Error: Course ID' + course_id + 'Already exists, please use another ID');
                     } else {
-                        alert('创建课程失败: ' + response.message);
+                        alert('Course creation failed: ' + response.message);
                     }
                 }
             },
             error: function(xhr) {
-                // 处理错误响应
-                let errorMsg = '创建课程失败';
+
+                let errorMsg = 'Course creation failed';
 
                 if (xhr.responseJSON && xhr.responseJSON.message) {
-                    // 尝试解析错误信息
+
                     const errMsg = xhr.responseJSON.message;
                     if (errMsg.includes('Duplicate entry')) {
-                        errorMsg = '错误: 课程ID ' + course_id + ' 已经存在，请使用其他ID';
+                        errorMsg = 'Error: Course ID ' + course_id + ' Already exists, please use another ID';
                     } else {
                         errorMsg += ': ' + errMsg;
                     }
@@ -448,7 +446,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $saveBtn.prop('disabled', false);
-                $saveBtn.find('span span').text('保存专业');
+                $saveBtn.find('span span').text('Save Major');
 
                 if (response.status === 'success') {
                    // Force close the modal
@@ -456,59 +454,58 @@ $(document).ready(function() {
 
          // Use setTimeout to ensure the modal is closed before displaying the success message
                     setTimeout(function() {
-                        alert('专业创建成功');
-                        location.reload(); // 刷新页面以确保UI更新
+                        alert('Major created successfully');
+                        location.reload();
                     }, 300);
                 } else {
-                    alert('创建专业失败: ' + response.message);
+                    alert('Major creation failed: ' + response.message);
                 }
             },
             error: function(xhr) {
                 $saveBtn.prop('disabled', false);
-                $saveBtn.find('span span').text('保存专业');
-                alert('创建专业失败: ' + (xhr.responseJSON ? xhr.responseJSON.message : '未知错误'));
+                $saveBtn.find('span span').text('Save Major');
+                alert('Major creation failed: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown Error'));
             }
         });
     });
 
-    // 清除模态框中的表单数据
+
     $('#addCourseModal, #addMajorModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
 
-    // Add CourseID实时检查
+
     $('#course_id').on('blur', function() {
         const courseId = $(this).val();
         if (courseId && courseId.trim() !== '') {
             const idStatus = $(this).next('small');
 
-            // 如果没有状态显示元素，添加一个
+
             let statusElement = idStatus.next('.id-status');
             if (statusElement.length === 0) {
                 idStatus.after('<div class="id-status mt-1"></div>');
                 statusElement = idStatus.next('.id-status');
             }
 
-            // 显示检查中状态
-            statusElement.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> 正在检查ID是否可用...</span>');
+            statusElement.html('<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Checking if the ID is available...</span>');
 
-            // 向后端发送请求检查ID
+
             $.ajax({
                 url: '/accounts/check_course_id_exists/',
                 method: 'GET',
                 data: { course_id: courseId },
                 success: function(response) {
                     if (response.exists) {
-                        // ID已存在
-                        statusElement.html('<span class="text-danger"><i class="fas fa-times-circle"></i> 此课程ID已存在，请使用其他ID</span>');
+
+                        statusElement.html('<span class="text-danger"><i class="fas fa-times-circle"></i> This course ID already exists, please use another ID</span>');
                     } else {
-                        // ID可用
-                        statusElement.html('<span class="text-success"><i class="fas fa-check-circle"></i> 此课程ID可用</span>');
+
+                        statusElement.html('<span class="text-success"><i class="fas fa-check-circle"></i> This course ID is available</span>');
                     }
                 },
                 error: function() {
-                    // 检查失败
-                    statusElement.html('<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> 无法检查ID，请确保输入唯一的ID</span>');
+
+                    statusElement.html('<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Unable to check the ID, please ensure you enter a unique ID</span>');
                 }
             });
         }

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('公告脚本已加载');
+    console.log('The announcement script has been loaded.');
     
     // 安全地添加事件监听器的辅助函数
     function addEventListenerSafely(selector, event, handler) {
@@ -15,15 +15,15 @@ document.addEventListener('DOMContentLoaded', function() {
     addEventListenerSafely('.edit-announcement', 'click', function() {
         const announcementId = this.getAttribute('data-id');
         // 实现编辑逻辑
-        console.log('编辑公告:', announcementId);
+        console.log('Edit Announcement:', announcementId);
     });
 
     // 删除公告按钮事件
     addEventListenerSafely('.delete-announcement', 'click', function() {
         const announcementId = this.getAttribute('data-id');
         // 实现删除逻辑
-        if (confirm('确定要删除这个公告吗？')) {
-            console.log('删除公告:', announcementId);
+        if (confirm('Are you sure you want to delete this announcement?')) {
+            console.log('Delete Announcement:', announcementId);
         }
     });
 
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addAnnouncementForm.addEventListener('submit', function(e) {
             e.preventDefault();
             // 实现添加公告的 AJAX 提交逻辑
-            console.log('提交新公告');
+            console.log('Submit New Announcement');
         });
     }
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 安全地为分页链接添加事件监听器
     addEventListenerSafely('.pagination .page-link', 'click', function(e) {
-        console.log('分页链接被点击');
+        console.log('The pagination link has been clicked.');
     });
 
     // 安全地添加搜索功能
@@ -100,5 +100,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    console.log('公告脚本初始化完成');
+    console.log('The announcement script has been initialized.');
 }); 

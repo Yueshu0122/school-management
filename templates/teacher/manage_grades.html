@@ -394,11 +394,11 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     showSaveStatus(row, true);
                 } else {
-                    showSaveStatus(row, false, response.message || '保存失败');
+                    showSaveStatus(row, false, response.message || 'Save failed');
                 }
             },
             error: function(xhr) {
-                const message = xhr.responseJSON ? xhr.responseJSON.message : '网络错误，请重试';
+                const message = xhr.responseJSON ? xhr.responseJSON.message : 'Network error, please try again';
                 showSaveStatus(row, false, message);
             },
             complete: function() {
@@ -454,7 +454,7 @@ $(document).ready(function() {
             data: {
                 labels: ['90-100', '80-89', '70-79', '60-69', '0-59'],
                 datasets: [{
-                    label: '学生人数',
+                    label: 'Number of Students',
                     data: calculateGradeDistribution(gradeData.gpa),
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.7)',
@@ -737,7 +737,7 @@ $(document).ready(function() {
 
     createDistributionChart();
 
-    // 切换图表类型
+
     $('.chart-tab').click(function() {
         $('.chart-tab').removeClass('active');
         $(this).addClass('active');

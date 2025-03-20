@@ -1,10 +1,10 @@
 {% extends 'student/base.html' %}
 
-{% block title %}我的成绩{% endblock %}
+{% block title %}My Grade{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* 表格美化样式 */
+
     .table-container {
         overflow-x: auto;
         padding: 10px;
@@ -14,24 +14,24 @@
         border-collapse: separate;
         border-spacing: 0;
         width: 100%;
-        min-width: 900px; /* 确保表格有最小宽度 */
+        min-width: 900px;
     }
     .table th,
     .table td {
         text-align: center;
         vertical-align: middle;
-        color: var(--td-heading-color); /* 与页面风格一致的字体颜色 */
+        color: var(--td-heading-color);
     }
     .table th {
-        background-color: #2c3e50; /* 深色背景提高对比度 */
-        color: #ffffff; /* 纯白色文字 */
-        font-weight: 600; /* 增加字体粗细 */
+        background-color: #2c3e50;
+        color: #ffffff;
+        font-weight: 600;
         padding: 12px 10px;
-        text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* 添加文字阴影增强可读性 */
-        letter-spacing: 0.5px; /* 增加字母间距 */
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        letter-spacing: 0.5px;
     }
     .table thead th {
-        border-bottom: 2px solid #1abc9c; /* 添加下边框强调 */
+        border-bottom: 2px solid #1abc9c;
     }
     .table thead th:first-child {
         border-top-left-radius: 8px;
@@ -62,12 +62,12 @@
 {% endblock %}
 
 {% block content %}
-<!-- 额外添加顶部间距，避免base.html中的元素遮挡 -->
+
 <div style="height: 35px;"></div>
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="td_fs_36 td_medium">我的成绩</h2>
+            <h2 class="td_fs_36 td_medium">My Grade</h2>
             <div class="header-actions">
                 <a href="{% url 'student_dashboard' %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium dashboard-link">
                     <span class="td_btn_in td_accent_color">
@@ -79,7 +79,7 @@
 
         <div class="card td_radius_10 td_gray_bg_5">
             <div class="card-header">
-                <h4 class="mb-0 td_fs_24 td_medium">成绩列表</h4>
+                <h4 class="mb-0 td_fs_24 td_medium">Grades List</h4>
             </div>
             <div class="card-body">
                 {% if grades %}
@@ -89,11 +89,11 @@
                                 <tr>
                                     <th>Course Number</th>
                                     <th>Course Name</th>
-                                    <th>期末考试</th>
-                                    <th>作业成绩</th>
-                                    <th>平时测验</th>
-                                    <th>出勤情况</th>
-                                    <th>绩点</th>
+                                    <th>Final Exam</th>
+                                    <th>Assignment Grades</th>
+                                    <th>Regular Quizzes</th>
+                                    <th>Attendance</th>
+                                    <th>GPA</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -2,13 +2,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
 
-# 添加自定义用户管理器
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('邮箱是必填项')
+            raise ValueError('The email address is a required field.')
         
-        # 确保用户名和邮箱相同
+
         username = email
         
         email = self.normalize_email(email)
@@ -23,14 +23,14 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
     
     def get_by_natural_key(self, username_or_email):
-        # 尝试通过电子邮件查找用户
+
         try:
             return self.get(email=username_or_email)
         except self.model.DoesNotExist:
-            # 如果通过邮箱找不到用户，则尝试通过用户名查找
+
             return self.get(username=username_or_email)
 
-# CustomUser 模型，严格按照 ER 图中的字段：
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
     CustomUser model following the ER diagram fields:
@@ -48,13 +48,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.CharField(max_length=255, db_column='email')
     linked_id = models.IntegerField(null=True, blank=True, db_column='linked_id')
 
-    # 添加自定义管理器
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
-    # 下面这些属性不会存入数据库，仅用于 Django 权限系统
+
     @property
     def is_staff(self):
         return self.role == 'admin'
@@ -75,7 +75,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return f"{self.username} ({self.role})"
 
 
-# Teacher 模型，严格按照 ER 图中的字段定义：
+
 class Teacher(models.Model):
     """
     Teacher
