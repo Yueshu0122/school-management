@@ -50,11 +50,11 @@
                                     <td>{{ announcement.title }}</td>
                                     <td>{{ announcement.content|truncatewords:30 }}</td>
                                     <td>{{ announcement.author.username }}</td>
-                                    <td>{{ announcement.publish_date|date:"Y年m月d日" }}</td>
+                                    <td>{{ announcement.publish_date|date:"Y Year m Month d Day" }}</td>
                                     <td>
                                         <a href="{% url 'edit_announcement' announcement.announcement_id %}" class="td_btn td_style_1 td_type_3 td_radius_10 td_medium btn-sm">
                                             <span class="td_btn_in td_accent_color">
-                                                <i class="fas fa-edit me-1"></i><span>编辑</span>
+                                                <i class="fas fa-edit me-1"></i><span>Edit</span>
                                             </span>
                                         </a>
                                         <button class="td_btn td_style_1 td_radius_10 td_medium btn-sm delete-announcement" 
